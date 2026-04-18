@@ -45,7 +45,7 @@ has you type a real `bitcoin-cli` command.
 | 2 | Hello Node | `bitcoin-cli getblockchaininfo` |
 | 3 | Block Count | `bitcoin-cli getblockcount` |
 | 4 | Peer Connections | `bitcoin-cli getconnectioncount` |
-| 5 | Genesis Block | `genesis block` |
+| 5 | The Origin Block | `genesis block` |
 | 6 | Explorer | `blockchain explorer` |
 
 ### Volume 2 — Keys & Wallets
@@ -54,53 +54,53 @@ has you type a real `bitcoin-cli` command.
 | Ch | Title | Answer / Command |
 |----|-------|------------------|
 | 7 | Private Key Secrets | `private key` |
-| 8 | Public Address | `address` |
-| 9 | Mnemonic Seed | `seed phrase` |
+| 8 | Shareable Identifier | `address` |
+| 9 | The Word List | `seed phrase` |
 | 10 | Wallet Backup | `bitcoin-cli backupwallet` |
-| 11 | SegWit | `segwit` |
-| 12 | Bech32 | `bech32` |
+| 11 | Signature Separation | `segwit` |
+| 12 | Native Address Encoding | `bech32` |
 
 ### Volume 3 — Transactions
 *"Every transaction tells a story on the blockchain."*
 
 | Ch | Title | Answer / Command |
 |----|-------|------------------|
-| 13 | UTXO | `UTXO` |
+| 13 | Unspent Outputs | `utxo` |
 | 14 | Creating Raw TX | `bitcoin-cli createrawtransaction` |
 | 15 | Signing | `bitcoin-cli signrawtransactionwithwallet` |
 | 16 | Broadcasting | `bitcoin-cli sendrawtransaction` |
-| 17 | Multisig | `multisig` |
-| 18 | Taproot | `taproot` |
-| 19 | Transaction Fees | `transaction fee` |
-| 20 | Locktime | `locktime` |
-| 21 | OP_RETURN | `OP_RETURN` |
+| 17 | Shared Control | `multisig` |
+| 18 | Hidden Script Paths | `taproot` |
+| 19 | Miner Incentive | `transaction fee` |
+| 20 | Time-Based Restriction | `locktime` |
+| 21 | Permanent Data Storage | `op_return` |
 
 ### Volume 4 — Network & Blockchain
 *"The gears that turn every 10 minutes."*
 
 | Ch | Title | Answer / Command |
 |----|-------|------------------|
-| 22 | The Mempool | `mempool` |
+| 22 | Transaction Queue | `mempool` |
 | 23 | Proof of Work | `nonce` |
 | 24 | Block Hash | `block hash` |
 | 25 | Difficulty Adjustment | `2016` |
-| 26 | Merkle Tree | `merkle tree` |
-| 27 | Soft vs Hard Forks | `soft fork` |
-| 28 | SPV | `simplified payment verification` |
+| 26 | Block Summary Tree | `merkle tree` |
+| 27 | Backward Compatible Upgrade | `soft fork` |
+| 28 | Light Client Verification | `simplified payment verification` |
 
 ### Volume 5 — Mining, Security & Layers
 *"Dig deep, stay secure, and look beyond the base chain."*
 
 | Ch | Title | Answer / Command |
 |----|-------|------------------|
-| 29 | Coinbase Transaction | `coinbase` |
-| 30 | The Halving | `halving` |
+| 29 | Block Reward Transaction | `coinbase` |
+| 30 | Subsidy Reduction | `halving` |
 | 31 | 21 Million | `21 million` |
-| 32 | Lightning Network | `lightning network` |
+| 32 | Off-Chain Payments | `lightning network` |
 | 33 | Not Your Keys | `coins` |
-| 34 | Mining Pools | `mining pool` |
+| 34 | Collaborative Mining | `mining pool` |
 | 35 | 51% Attack | `51%` |
-| 36 | Hardware Wallet | `hardware wallet` |
+| 36 | Air-Gapped Vault | `hardware wallet` |
 
 ---
 
@@ -172,7 +172,7 @@ Each hint used costs a small XP penalty. You always earn at least 25% of the bas
 - **5 volumes × 36 chapters** covering Bitcoin from whitepaper to Lightning
 - 3-tier hint system with XP penalty — not hand-holding, just scaffolding
 - Synthesised ambient music (3 Bitcoin-themed tracks) + sound effects via `rodio` — no audio files
-- Bitcoin-coin flood transition animation between chapters
+- ₿ tile-flood transition animation between chapters
 - Save / continue system at `~/.satoshi-terminal/save.json`
 - Terminal minimum 80×24 — shows resize warning if too small
 - Smooth UI animations via `vyfor/animate`
