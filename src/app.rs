@@ -303,6 +303,26 @@ impl App {
             self.chapter_state.flash_correct -= 1;
         }
 
+        // Timer tick during gameplay (pauses while hint panel is open)
+        if let AppState::Playing { vol_idx, ch_idx } = self.state {
+            if self.chapter_state.time_remaining_ticks > 0 && !self.chapter_state.show_hint {
+                self.chapter_state.time_remaining_ticks -= 1;
+            }
+            // Hard mode: time expiry = instant fail
+            if self.save.difficulty == Difficulty::Hard
+                && self.chapter_state.time_remaining_ticks == 0
+                && !self.chapter_state.completed
+            {
+                self.sound.play(Sound::Error);
+                self.chapter_state.flash_wrong = 12;
+                self.chapter_state.input.clear();
+                // Reset timer so player can retry
+                if let Some(ch) = self.current_chapter(vol_idx, ch_idx) {
+                    self.chapter_state.set_timer(ch.time_limit_secs);
+                }
+            }
+        }
+
         // ChapterComplete — animate but do not auto-advance
         if let AppState::ChapterComplete {
             vol_idx,
@@ -516,6 +536,9 @@ impl App {
         if key.code == KeyCode::Enter || key.code == KeyCode::Char(' ') {
             self.sound.play(Sound::KeyPress);
             self.chapter_state = ChapterState::new();
+            if let Some(ch) = self.current_chapter(vol_idx, ch_idx) {
+                self.chapter_state.set_timer(ch.time_limit_secs);
+            }
             self.state = AppState::Playing { vol_idx, ch_idx };
         }
         if key.code == KeyCode::Esc || key.code == KeyCode::Char('q') {
@@ -576,7 +599,7 @@ impl App {
 
                 if correct {
                     let diff = self.save.difficulty;
-                    let xp = chapter
+                    let mut xp = chapter
                         .xp
                         .saturating_sub(
                             (self.chapter_state.attempts.saturating_sub(1))
@@ -584,6 +607,22 @@ impl App {
                         )
                         .saturating_sub(self.chapter_state.hint_level as u32 * diff.hint_penalty())
                         .max(chapter.xp * diff.floor_pct() / 100);
+
+                    // Speed bonus on Easy / Normal (not Hard)
+                    if diff != Difficulty::Hard {
+                        let total_ticks = chapter.time_limit_secs.saturating_mul(10);
+                        if total_ticks > 0 && self.chapter_state.time_remaining_ticks > 0 {
+                            let ratio =
+                                self.chapter_state.time_remaining_ticks as f32 / total_ticks as f32;
+                            let bonus_pct = match diff {
+                                Difficulty::Easy => 0.30,
+                                _ => 0.20,
+                            };
+                            let bonus = (chapter.xp as f32 * ratio * bonus_pct) as u32;
+                            xp += bonus;
+                        }
+                    }
+
                     self.save.record_chapter(vol_idx, ch_idx, xp);
                     self.save.save();
                     self.sound.play(Sound::LevelComplete);

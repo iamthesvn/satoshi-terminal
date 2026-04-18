@@ -79,12 +79,19 @@ pub struct ChapterState {
     pub completed: bool,
     /// Running count of submission attempts.
     pub attempts: u32,
+    /// Timer remaining in game ticks (100 ms each). 0 = expired.
+    pub time_remaining_ticks: u32,
 }
 
 impl ChapterState {
     /// Create a new state with the start timer set to right now.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Reset timer from a chapter's time limit (seconds → 100 ms ticks).
+    pub fn set_timer(&mut self, secs: u32) {
+        self.time_remaining_ticks = secs.saturating_mul(10);
     }
 }
 
@@ -137,16 +144,18 @@ pub fn draw_chapter(
     let max_hint = area.height.saturating_sub(14);
     let hint_height = ((full_hint_height as f64 * openness) as u16).min(max_hint);
 
+    let timer_height: u16 = 1; // thin timer bar above HUD
     let terminal_height: u16 = 3; // border + 1 content row + border
     let hud_height: u16 = 3; // border + 1 content row + border
 
     // Remaining height for the art/dialogue/task area.
     let mid_height = area
         .height
-        .saturating_sub(hud_height + terminal_height + hint_height);
+        .saturating_sub(timer_height + hud_height + terminal_height + hint_height);
 
     let vertical_constraints: Vec<Constraint> = if show_hint_anim {
         vec![
+            Constraint::Length(timer_height),
             Constraint::Length(hud_height),
             Constraint::Length(mid_height),
             Constraint::Length(terminal_height),
@@ -154,6 +163,7 @@ pub fn draw_chapter(
         ]
     } else {
         vec![
+            Constraint::Length(timer_height),
             Constraint::Length(hud_height),
             Constraint::Min(mid_height),
             Constraint::Length(terminal_height),
@@ -165,17 +175,60 @@ pub fn draw_chapter(
         .constraints(vertical_constraints)
         .split(area);
 
-    // Draw each zone. Index safety: rows will always have at least 3 entries
-    // because we provided at least 3 constraints above.
+    // Draw each zone. Index safety: rows will always have at least 4 entries
+    // because we provided at least 4 constraints above.
+    draw_timer_bar(frame, chapter, state, rows[0], difficulty);
     draw_hud(
-        frame, vol_num, ch_num, chapter, state, rows[0], total_xp, difficulty,
+        frame, vol_num, ch_num, chapter, state, rows[1], total_xp, difficulty,
     );
-    draw_mid(frame, chapter, state, rows[1]);
-    draw_terminal(frame, chapter, state, rows[2], anim);
+    draw_mid(frame, chapter, state, rows[2]);
+    draw_terminal(frame, chapter, state, rows[3], anim);
 
-    if show_hint_anim && let Some(hint_area) = rows.get(3) {
+    if show_hint_anim && let Some(hint_area) = rows.get(4) {
         draw_hints(frame, chapter, state, *hint_area, anim);
     }
+}
+
+// ── Timer bar ─────────────────────────────────────────────────────────────────
+
+fn draw_timer_bar(
+    frame: &mut Frame,
+    chapter: &Chapter,
+    state: &ChapterState,
+    area: Rect,
+    difficulty: crate::app::Difficulty,
+) {
+    if area.width == 0 || area.height == 0 {
+        return;
+    }
+    let total_ticks = chapter.time_limit_secs.saturating_mul(10);
+    if total_ticks == 0 {
+        return;
+    }
+
+    let remaining = state.time_remaining_ticks.min(total_ticks);
+    let ratio = remaining as f32 / total_ticks as f32;
+
+    let bar_width = area.width as usize;
+    let filled = (ratio * bar_width as f32).ceil() as usize;
+    let empty = bar_width.saturating_sub(filled);
+
+    let (fg, bg) = if difficulty == crate::app::Difficulty::Hard && ratio < 0.25 {
+        (Color::Rgb(200, 40, 40), Color::Rgb(40, 10, 10))
+    } else if ratio < 0.25 {
+        (Color::Rgb(247, 147, 26), Color::Rgb(40, 20, 5))
+    } else if ratio < 0.5 {
+        (Color::Rgb(240, 200, 40), Color::Rgb(30, 25, 5))
+    } else {
+        (Color::Rgb(60, 210, 80), Color::Rgb(10, 30, 10))
+    };
+
+    let filled_ch = "▓";
+    let empty_ch = "░";
+    let bar_text = format!("{}{}", filled_ch.repeat(filled), empty_ch.repeat(empty));
+
+    let line = Line::from(Span::styled(bar_text, Style::default().fg(fg).bg(bg)));
+    frame.render_widget(Paragraph::new(line).style(Style::default().bg(bg)), area);
 }
 
 // ── HUD bar ───────────────────────────────────────────────────────────────────

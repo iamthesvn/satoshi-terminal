@@ -12,6 +12,8 @@ pub struct Chapter {
     pub hints: &'static [&'static str],
     pub success_message: &'static str,
     pub xp: u32,
+    /// Time limit in seconds for this chapter.
+    pub time_limit_secs: u32,
 }
 
 #[derive(Clone)]
@@ -86,6 +88,7 @@ fn volume_1() -> Volume {
                 ],
                 success_message: "Correct. The whitepaper laid the foundation for everything we do here.",
                 xp: 10,
+                time_limit_secs: 60,
             },
             // ---------------------------------------------------------------
             // Chapter 2 — Hello Node
@@ -118,6 +121,7 @@ fn volume_1() -> Volume {
                 ],
                 success_message: "Node is synced and healthy. You can see the chain height and network info.",
                 xp: 10,
+                time_limit_secs: 60,
             },
             // ---------------------------------------------------------------
             // Chapter 3 — Block Count
@@ -148,6 +152,7 @@ fn volume_1() -> Volume {
                 ],
                 success_message: "Block count retrieved. The chain keeps growing, one block at a time.",
                 xp: 10,
+                time_limit_secs: 60,
             },
             // ---------------------------------------------------------------
             // Chapter 4 — Peer Connections
@@ -178,6 +183,7 @@ fn volume_1() -> Volume {
                 ],
                 success_message: "Connections confirmed. You're part of the network now.",
                 xp: 10,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 5 — Genesis Block
@@ -207,6 +213,7 @@ fn volume_1() -> Volume {
                 ],
                 success_message: "Genesis Block — the big bang of the Bitcoin blockchain.",
                 xp: 15,
+                time_limit_secs: 45,
             },
             // ---------------------------------------------------------------
             // Chapter 6 — Explorer
@@ -237,6 +244,7 @@ fn volume_1() -> Volume {
                 ],
                 success_message: "Explorer — the window into Bitcoin's transparent ledger.",
                 xp: 15,
+                time_limit_secs: 30,
             },
         ],
     }
@@ -282,6 +290,7 @@ fn volume_2() -> Volume {
                 ],
                 success_message: "Exactly. Guard it with your life. Lose the key, lose the coins.",
                 xp: 15,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 8 — Public Address
@@ -312,6 +321,7 @@ fn volume_2() -> Volume {
                 ],
                 success_message: "Correct. You can share your address freely. Just never share the private key.",
                 xp: 15,
+                time_limit_secs: 45,
             },
             // ---------------------------------------------------------------
             // Chapter 9 — Mnemonic Seed
@@ -347,6 +357,7 @@ fn volume_2() -> Volume {
                 ],
                 success_message: "Right. Write it down. Keep it offline. Never store it in the cloud.",
                 xp: 15,
+                time_limit_secs: 60,
             },
             // ---------------------------------------------------------------
             // Chapter 10 — Wallet Backup
@@ -377,6 +388,7 @@ fn volume_2() -> Volume {
                 ],
                 success_message: "Backup created. Redundancy is the only insurance in Bitcoin.",
                 xp: 15,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 11 — SegWit
@@ -413,6 +425,7 @@ fn volume_2() -> Volume {
                 ],
                 success_message: "SegWit — separating signatures to scale Bitcoin securely.",
                 xp: 20,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 12 — Bech32
@@ -444,6 +457,7 @@ fn volume_2() -> Volume {
                 ],
                 success_message: "Bech32 — the cleaner, lighter address format for native SegWit.",
                 xp: 20,
+                time_limit_secs: 30,
             },
         ],
     }
@@ -488,6 +502,7 @@ fn volume_3() -> Volume {
                 ],
                 success_message: "UTXO — the fundamental unit of value in Bitcoin. Master this and you master the ledger.",
                 xp: 15,
+                time_limit_secs: 60,
             },
             // ---------------------------------------------------------------
             // Chapter 14 — Creating Raw TX
@@ -518,6 +533,7 @@ fn volume_3() -> Volume {
                 ],
                 success_message: "Raw transaction hex generated. Next step: sign it.",
                 xp: 15,
+                time_limit_secs: 75,
             },
             // ---------------------------------------------------------------
             // Chapter 15 — Signing
@@ -548,6 +564,7 @@ fn volume_3() -> Volume {
                 ],
                 success_message: "Transaction signed. The signature cryptographically proves ownership.",
                 xp: 15,
+                time_limit_secs: 60,
             },
             // ---------------------------------------------------------------
             // Chapter 16 — Broadcasting
@@ -578,6 +595,7 @@ fn volume_3() -> Volume {
                 ],
                 success_message: "Broadcast successful. The transaction is now in mempools around the world.",
                 xp: 15,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 17 — Multisig
@@ -608,6 +626,7 @@ fn volume_3() -> Volume {
                 ],
                 success_message: "Multisig understood. Shared control is shared security.",
                 xp: 15,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 18 — Taproot
@@ -638,6 +657,7 @@ fn volume_3() -> Volume {
                 ],
                 success_message: "Taproot — where all spend paths look the same. Privacy by design.",
                 xp: 20,
+                time_limit_secs: 45,
             },
             // ---------------------------------------------------------------
             // Chapter 19 — Transaction Fees
@@ -669,6 +689,7 @@ fn volume_3() -> Volume {
                 ],
                 success_message: "Transaction fee — the market price for block space.",
                 xp: 20,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 20 — Locktime
@@ -700,6 +721,7 @@ fn volume_3() -> Volume {
                 ],
                 success_message: "Locktime — time travel for your bitcoin, but only forward.",
                 xp: 20,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 21 — OP_RETURN
@@ -731,6 +753,7 @@ fn volume_3() -> Volume {
                 ],
                 success_message: "OP_RETURN — Bitcoin's permanent notepad, limited to 80 bytes.",
                 xp: 20,
+                time_limit_secs: 30,
             },
         ],
     }
@@ -775,6 +798,7 @@ fn volume_4() -> Volume {
                 ],
                 success_message: "Mempool — the waiting room of Bitcoin. Transactions compete for block space here.",
                 xp: 15,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 23 — Proof of Work
@@ -805,6 +829,7 @@ fn volume_4() -> Volume {
                 ],
                 success_message: "Nonce found. Proof of work transforms electricity into immutable history.",
                 xp: 20,
+                time_limit_secs: 45,
             },
             // ---------------------------------------------------------------
             // Chapter 24 — Block Hash
@@ -835,6 +860,7 @@ fn volume_4() -> Volume {
                 ],
                 success_message: "Block hash — the DNA of every block. Change one bit and the hash changes completely.",
                 xp: 15,
+                time_limit_secs: 20,
             },
             // ---------------------------------------------------------------
             // Chapter 25 — Difficulty Adjustment
@@ -865,6 +891,7 @@ fn volume_4() -> Volume {
                 ],
                 success_message: "2016 blocks. The protocol self-regulates, no central planner needed.",
                 xp: 20,
+                time_limit_secs: 45,
             },
             // ---------------------------------------------------------------
             // Chapter 26 — Merkle Tree
@@ -895,6 +922,7 @@ fn volume_4() -> Volume {
                 ],
                 success_message: "Merkle tree — efficient cryptographic proof that a transaction is in a block.",
                 xp: 20,
+                time_limit_secs: 45,
             },
             // ---------------------------------------------------------------
             // Chapter 27 — Soft vs Hard Forks
@@ -925,6 +953,7 @@ fn volume_4() -> Volume {
                 ],
                 success_message: "Soft fork — tightening the rules without breaking old software.",
                 xp: 20,
+                time_limit_secs: 60,
             },
             // ---------------------------------------------------------------
             // Chapter 28 — SPV
@@ -958,6 +987,7 @@ fn volume_4() -> Volume {
                 ],
                 success_message: "SPV — trust minimization for devices that can't store 600+ GB.",
                 xp: 20,
+                time_limit_secs: 30,
             },
         ],
     }
@@ -1002,6 +1032,7 @@ fn volume_5() -> Volume {
                 ],
                 success_message: "Coinbase transaction — where all new bitcoin is born, one block at a time.",
                 xp: 20,
+                time_limit_secs: 30,
             },
             // ---------------------------------------------------------------
             // Chapter 30 — The Halving
@@ -1032,6 +1063,7 @@ fn volume_5() -> Volume {
                 ],
                 success_message: "Halving — the heartbeat of Bitcoin's disinflationary schedule.",
                 xp: 20,
+                time_limit_secs: 20,
             },
             // ---------------------------------------------------------------
             // Chapter 31 — 21 Million
@@ -1062,6 +1094,7 @@ fn volume_5() -> Volume {
                 ],
                 success_message: "21 million. Scarce by design. No printing press, no central bank.",
                 xp: 20,
+                time_limit_secs: 45,
             },
             // ---------------------------------------------------------------
             // Chapter 32 — Lightning Network
@@ -1092,6 +1125,7 @@ fn volume_5() -> Volume {
                 ],
                 success_message: "Lightning Network — scaling Bitcoin without sacrificing decentralization.",
                 xp: 25,
+                time_limit_secs: 20,
             },
             // ---------------------------------------------------------------
             // Chapter 33 — Not Your Keys
@@ -1122,6 +1156,7 @@ fn volume_5() -> Volume {
                 ],
                 success_message: "Not your keys, not your coins. Self-custody is self-sovereignty.",
                 xp: 25,
+                time_limit_secs: 45,
             },
             // ---------------------------------------------------------------
             // Chapter 34 — Mining Pools
@@ -1152,6 +1187,7 @@ fn volume_5() -> Volume {
                 ],
                 success_message: "Mining pool — strength in numbers for the proof-of-work race.",
                 xp: 20,
+                time_limit_secs: 20,
             },
             // ---------------------------------------------------------------
             // Chapter 35 — 51% Attack
@@ -1183,6 +1219,7 @@ fn volume_5() -> Volume {
                 ],
                 success_message: "51% — the theoretical tipping point where miners could outpace the honest chain.",
                 xp: 25,
+                time_limit_secs: 45,
             },
             // ---------------------------------------------------------------
             // Chapter 36 — Hardware Wallet
@@ -1212,6 +1249,7 @@ fn volume_5() -> Volume {
                 ],
                 success_message: "Hardware wallet — your private keys never touch the internet.",
                 xp: 25,
+                time_limit_secs: 45,
             },
         ],
     }
