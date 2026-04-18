@@ -22,6 +22,9 @@ pub fn draw(frame: &mut Frame, app: &App) {
         AppState::Menu { selected } => {
             menu::draw_menu(frame, frame.area(), *selected, *app.anim.menu_glow);
         }
+        AppState::DifficultySelect { selected } => {
+            menu::draw_difficulty_select(frame, frame.area(), *selected, app.save.difficulty);
+        }
         AppState::VolumeSelect { selected } => {
             draw_volume_select(frame, app, *selected);
         }
@@ -38,6 +41,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
                     &app.chapter_state,
                     &app.anim,
                     app.total_xp(),
+                    app.save.difficulty,
                 );
             }
         }

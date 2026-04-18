@@ -62,8 +62,7 @@ const HINT_BG: Color = Color::Rgb(15, 15, 30);
 /// * Append / remove from `input` on character / backspace events.
 /// * Toggle `show_hint` when `?` is pressed.
 /// * Advance `hint_level` (up to 3) when `H` is pressed.
-#[derive(Clone)]
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct ChapterState {
     /// The text the player has typed so far.
     pub input: String,
@@ -82,7 +81,6 @@ pub struct ChapterState {
     pub attempts: u32,
 }
 
-
 impl ChapterState {
     /// Create a new state with the start timer set to right now.
     pub fn new() -> Self {
@@ -100,6 +98,7 @@ impl ChapterState {
 /// * `ch_num`  - 1-indexed chapter number shown in the HUD.
 /// * `chapter` - Chapter data (NPC, ASCII art, dialogue, task, hints, XP).
 /// * `state`   - Current mutable-but-read-only-for-rendering player state.
+#[allow(clippy::too_many_arguments)]
 pub fn draw_chapter(
     frame: &mut Frame,
     vol_num: usize,
@@ -108,6 +107,7 @@ pub fn draw_chapter(
     state: &ChapterState,
     anim: &AnimState,
     total_xp: u32,
+    difficulty: crate::app::Difficulty,
 ) {
     let area = frame.area();
 
@@ -167,19 +167,21 @@ pub fn draw_chapter(
 
     // Draw each zone. Index safety: rows will always have at least 3 entries
     // because we provided at least 3 constraints above.
-    draw_hud(frame, vol_num, ch_num, chapter, state, rows[0], total_xp);
+    draw_hud(
+        frame, vol_num, ch_num, chapter, state, rows[0], total_xp, difficulty,
+    );
     draw_mid(frame, chapter, state, rows[1]);
     draw_terminal(frame, chapter, state, rows[2], anim);
 
-    if show_hint_anim
-        && let Some(hint_area) = rows.get(3) {
-            draw_hints(frame, chapter, state, *hint_area, anim);
-        }
+    if show_hint_anim && let Some(hint_area) = rows.get(3) {
+        draw_hints(frame, chapter, state, *hint_area, anim);
+    }
 }
 
 // ── HUD bar ───────────────────────────────────────────────────────────────────
 
 /// Draw the top HUD bar:  `Vol N · Ch N · title   XP: NNN  [?] Hint  [^C] Quit`
+#[allow(clippy::too_many_arguments)]
 fn draw_hud(
     frame: &mut Frame,
     vol_num: usize,
@@ -188,13 +190,14 @@ fn draw_hud(
     _state: &ChapterState,
     area: Rect,
     total_xp: u32,
+    difficulty: crate::app::Difficulty,
 ) {
     if area.width == 0 || area.height == 0 {
         return;
     }
 
-    // Left portion: breadcrumb
-    let breadcrumb = format!(" Vol {} . Ch {} . {}", vol_num, ch_num, chapter.title);
+    // Left portion: breadcrumb + difficulty badge
+    let diff_badge = format!("[{}] ", difficulty.short());
 
     // Right portion: XP + keybind hints
     let xp_str = format!(
@@ -210,10 +213,21 @@ fn draw_hud(
         .split(area);
 
     // Left: breadcrumb in accent colour
-    let left_line = Line::from(vec![Span::styled(
-        breadcrumb,
-        Style::default().fg(ACCENT).add_modifier(Modifier::BOLD),
-    )]);
+    let diff_color = match difficulty {
+        crate::app::Difficulty::Easy => Color::Green,
+        crate::app::Difficulty::Normal => Color::Yellow,
+        crate::app::Difficulty::Hard => Color::Red,
+    };
+    let left_line = Line::from(vec![
+        Span::styled(
+            diff_badge,
+            Style::default().fg(diff_color).add_modifier(Modifier::BOLD),
+        ),
+        Span::styled(
+            format!("Vol {} . Ch {} . {}", vol_num, ch_num, chapter.title),
+            Style::default().fg(ACCENT).add_modifier(Modifier::BOLD),
+        ),
+    ]);
     let left_para = Paragraph::new(left_line).block(
         Block::default()
             .borders(Borders::ALL)

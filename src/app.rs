@@ -22,6 +22,63 @@ use animate::Animate;
 
 const TICK_RATE: Duration = Duration::from_millis(100);
 
+// ── Difficulty ────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub enum Difficulty {
+    Easy,
+    #[default]
+    Normal,
+    Hard,
+}
+
+impl Difficulty {
+    #[allow(dead_code)]
+    pub fn label(&self) -> &'static str {
+        match self {
+            Difficulty::Easy => "Easy",
+            Difficulty::Normal => "Normal",
+            Difficulty::Hard => "Hard",
+        }
+    }
+
+    pub fn short(&self) -> &'static str {
+        match self {
+            Difficulty::Easy => "E",
+            Difficulty::Normal => "N",
+            Difficulty::Hard => "H",
+        }
+    }
+
+    pub fn hint_penalty(&self) -> u32 {
+        match self {
+            Difficulty::Easy => 0,
+            Difficulty::Normal => 3,
+            Difficulty::Hard => 999, // effectively disables hints
+        }
+    }
+
+    pub fn attempt_penalty(&self) -> u32 {
+        match self {
+            Difficulty::Easy => 0,
+            Difficulty::Normal => 2,
+            Difficulty::Hard => 5,
+        }
+    }
+
+    pub fn floor_pct(&self) -> u32 {
+        match self {
+            Difficulty::Easy => 50,
+            Difficulty::Normal => 25,
+            Difficulty::Hard => 10,
+        }
+    }
+
+    pub fn hints_allowed(&self) -> bool {
+        !matches!(self, Difficulty::Hard)
+    }
+}
+
 // ── Save data ─────────────────────────────────────────────────────────────────
 
 pub struct SaveData {
@@ -29,6 +86,7 @@ pub struct SaveData {
     pub ch_idx: usize,  // 0-based index into current volume's chapters
     pub total_xp: u32,
     pub xp_per_chapter: Vec<Vec<u32>>, // [vol][ch]
+    pub difficulty: Difficulty,
 }
 
 fn save_path() -> Option<std::path::PathBuf> {
@@ -39,38 +97,47 @@ impl SaveData {
     pub fn load() -> Self {
         if let Some(path) = save_path()
             && let Ok(data) = std::fs::read_to_string(&path)
-                && let Ok(json) = serde_json::from_str::<serde_json::Value>(&data) {
-                    let vol_idx = json["vol_idx"].as_u64().unwrap_or(0) as usize;
-                    let ch_idx = json["ch_idx"].as_u64().unwrap_or(0) as usize;
-                    let total_xp = json["total_xp"].as_u64().unwrap_or(0) as u32;
-                    let xp_per_chapter = json["xp_per_chapter"]
-                        .as_array()
-                        .map(|vols| {
-                            vols.iter()
-                                .map(|v| {
-                                    v.as_array()
-                                        .map(|chs| {
-                                            chs.iter()
-                                                .map(|x| x.as_u64().unwrap_or(0) as u32)
-                                                .collect()
-                                        })
-                                        .unwrap_or_default()
+            && let Ok(json) = serde_json::from_str::<serde_json::Value>(&data)
+        {
+            let vol_idx = json["vol_idx"].as_u64().unwrap_or(0) as usize;
+            let ch_idx = json["ch_idx"].as_u64().unwrap_or(0) as usize;
+            let total_xp = json["total_xp"].as_u64().unwrap_or(0) as u32;
+            let xp_per_chapter = json["xp_per_chapter"]
+                .as_array()
+                .map(|vols| {
+                    vols.iter()
+                        .map(|v| {
+                            v.as_array()
+                                .map(|chs| {
+                                    chs.iter().map(|x| x.as_u64().unwrap_or(0) as u32).collect()
                                 })
-                                .collect()
+                                .unwrap_or_default()
                         })
-                        .unwrap_or_default();
-                    return Self {
-                        vol_idx,
-                        ch_idx,
-                        total_xp,
-                        xp_per_chapter,
-                    };
-                }
+                        .collect()
+                })
+                .unwrap_or_default();
+            let difficulty = json["difficulty"]
+                .as_str()
+                .map(|s| match s {
+                    "easy" => Difficulty::Easy,
+                    "hard" => Difficulty::Hard,
+                    _ => Difficulty::Normal,
+                })
+                .unwrap_or(Difficulty::Normal);
+            return Self {
+                vol_idx,
+                ch_idx,
+                total_xp,
+                xp_per_chapter,
+                difficulty,
+            };
+        }
         Self {
             vol_idx: 0,
             ch_idx: 0,
             total_xp: 0,
             xp_per_chapter: vec![],
+            difficulty: Difficulty::Normal,
         }
     }
 
@@ -79,11 +146,17 @@ impl SaveData {
             if let Some(dir) = path.parent() {
                 let _ = std::fs::create_dir_all(dir);
             }
+            let diff_str = match self.difficulty {
+                Difficulty::Easy => "easy",
+                Difficulty::Normal => "normal",
+                Difficulty::Hard => "hard",
+            };
             let json = serde_json::json!({
                 "vol_idx": self.vol_idx,
                 "ch_idx": self.ch_idx,
                 "total_xp": self.total_xp,
                 "xp_per_chapter": self.xp_per_chapter,
+                "difficulty": diff_str,
             });
             let _ = std::fs::write(&path, json.to_string());
         }
@@ -94,6 +167,7 @@ impl SaveData {
         self.ch_idx = 0;
         self.total_xp = 0;
         self.xp_per_chapter = vec![];
+        // note: difficulty is NOT reset — player keeps their chosen setting
     }
 
     pub fn record_chapter(&mut self, vol_idx: usize, ch_idx: usize, xp: u32) {
@@ -122,6 +196,10 @@ impl SaveData {
 pub enum AppState {
     /// Main menu (New Game / Continue / Quit)
     Menu {
+        selected: usize,
+    },
+    /// Difficulty selection after New Game
+    DifficultySelect {
         selected: usize,
     },
     /// Volume selection screen
@@ -320,6 +398,7 @@ impl App {
 
         match self.state.clone() {
             AppState::Menu { selected } => self.handle_menu(key, selected),
+            AppState::DifficultySelect { selected } => self.handle_difficulty_select(key, selected),
             AppState::VolumeSelect { selected } => self.handle_volume_select(key, selected),
             AppState::ChapterIntro { vol_idx, ch_idx } => self.handle_intro(key, vol_idx, ch_idx),
             AppState::Playing { vol_idx, ch_idx } => self.handle_playing(key, vol_idx, ch_idx),
@@ -347,13 +426,9 @@ impl App {
                 self.sound.play(Sound::Correct);
                 match selected {
                     0 => {
-                        // New Game
+                        // New Game → difficulty select
                         self.save.reset();
-                        self.chapter_state = ChapterState::new();
-                        self.state = AppState::ChapterIntro {
-                            vol_idx: 0,
-                            ch_idx: 0,
-                        };
+                        self.state = AppState::DifficultySelect { selected: 1 };
                     }
                     1 => {
                         // Continue
@@ -372,6 +447,39 @@ impl App {
                     }
                     _ => self.state = AppState::Quit,
                 }
+            }
+            _ => {}
+        }
+    }
+
+    fn handle_difficulty_select(&mut self, key: KeyEvent, selected: usize) {
+        match key.code {
+            KeyCode::Up | KeyCode::Char('k') => {
+                self.state = AppState::DifficultySelect {
+                    selected: selected.saturating_sub(1),
+                };
+            }
+            KeyCode::Down | KeyCode::Char('j') => {
+                self.state = AppState::DifficultySelect {
+                    selected: (selected + 1).min(2),
+                };
+            }
+            KeyCode::Enter | KeyCode::Char(' ') => {
+                self.save.difficulty = match selected {
+                    0 => Difficulty::Easy,
+                    1 => Difficulty::Normal,
+                    _ => Difficulty::Hard,
+                };
+                self.save.save();
+                self.sound.play(Sound::Correct);
+                self.chapter_state = ChapterState::new();
+                self.state = AppState::ChapterIntro {
+                    vol_idx: 0,
+                    ch_idx: 0,
+                };
+            }
+            KeyCode::Esc | KeyCode::Char('q') => {
+                self.state = AppState::Menu { selected: 0 };
             }
             _ => {}
         }
@@ -421,8 +529,8 @@ impl App {
             None => return,
         };
 
-        // [?] toggles hint panel open/closed — never conflicts with typing
-        if key.code == KeyCode::Char('?') {
+        // [?] toggles hint panel open/closed — disabled on Hard
+        if key.code == KeyCode::Char('?') && self.save.difficulty.hints_allowed() {
             self.chapter_state.show_hint = !self.chapter_state.show_hint;
             self.anim.set_hint_open(self.chapter_state.show_hint);
             self.sound.play(Sound::KeyPress);
@@ -430,7 +538,10 @@ impl App {
         }
 
         // [Tab] reveals next hint tier when the hint panel is already open.
-        if key.code == KeyCode::Tab && self.chapter_state.show_hint {
+        if key.code == KeyCode::Tab
+            && self.chapter_state.show_hint
+            && self.save.difficulty.hints_allowed()
+        {
             if self.chapter_state.hint_level < chapter.hints.len() {
                 self.chapter_state.hint_level += 1;
                 self.sound.play(Sound::KeyPress);
@@ -464,12 +575,15 @@ impl App {
                 });
 
                 if correct {
-                    // Score: base xp, -1 per extra attempt, -1 per hint revealed
+                    let diff = self.save.difficulty;
                     let xp = chapter
                         .xp
-                        .saturating_sub((self.chapter_state.attempts.saturating_sub(1)) * 2)
-                        .saturating_sub(self.chapter_state.hint_level as u32 * 3)
-                        .max(chapter.xp / 4); // floor at 25%
+                        .saturating_sub(
+                            (self.chapter_state.attempts.saturating_sub(1))
+                                * diff.attempt_penalty(),
+                        )
+                        .saturating_sub(self.chapter_state.hint_level as u32 * diff.hint_penalty())
+                        .max(chapter.xp * diff.floor_pct() / 100);
                     self.save.record_chapter(vol_idx, ch_idx, xp);
                     self.save.save();
                     self.sound.play(Sound::LevelComplete);
@@ -548,9 +662,10 @@ where
             .checked_sub(last_tick.elapsed())
             .unwrap_or(Duration::ZERO);
         if event::poll(timeout)?
-            && let Event::Key(key) = event::read()? {
-                app.handle_key(key);
-            }
+            && let Event::Key(key) = event::read()?
+        {
+            app.handle_key(key);
+        }
 
         // Tick
         if last_tick.elapsed() >= TICK_RATE {
