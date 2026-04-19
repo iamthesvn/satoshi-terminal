@@ -24,7 +24,7 @@ const LOGO_ART: &[&str] = &[
     r"   ╚═╝    ╚══════╝  ╚═╝  ╚═╝  ╚═╝     ╚═╝ ╚═╝ ╚═╝  ╚══╝ ╚═╝  ╚═╝ ╚══════╝ ",
 ];
 
-const MENU_ITEMS: &[&str] = &["     New Game", "     Continue", "     Quit"];
+const MENU_ITEMS: &[&str] = &["     Boot Node", "     Sync Progress", "     Power Down"];
 
 pub fn draw_menu(frame: &mut Frame, area: Rect, selected: usize, border_breathe: Color) {
     // Wide enough for QUEST logo (44 chars) + padding
@@ -127,18 +127,18 @@ pub fn draw_menu(frame: &mut Frame, area: Rect, selected: usize, border_breathe:
 const DIFFICULTY_ITEMS: &[(Difficulty, &str, &str)] = &[
     (
         Difficulty::Easy,
-        "Easy",
-        "Hints are free. No penalty for wrong attempts. Floor at 50% XP.",
+        "Testnet",
+        "Hints are free. No penalty for wrong attempts. Floor at 50% Sats.",
     ),
     (
         Difficulty::Normal,
-        "Normal",
-        "-3 XP per hint. -2 XP per retry. Floor at 25% XP.",
+        "Mainnet",
+        "-3 Sats per hint. -2 Sats per retry. Floor at 25% Sats.",
     ),
     (
         Difficulty::Hard,
-        "Hard",
-        "No hints. -5 XP per retry. Floor at 10% XP.",
+        "Maximalist",
+        "No hints. -5 Sats per retry. Floor at 10% Sats.",
     ),
 ];
 

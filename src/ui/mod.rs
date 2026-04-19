@@ -303,7 +303,7 @@ fn draw_chapter_complete(
     let mut lines = vec![
         Line::from(""),
         Line::from(Span::styled(
-            "  ✓  Chapter Complete!",
+            "  ✓  Block Mined!",
             Style::default()
                 .fg(Color::Rgb(60, 220, 100))
                 .add_modifier(Modifier::BOLD),
@@ -317,7 +317,7 @@ fn draw_chapter_complete(
         )),
         Line::from(""),
         Line::from(vec![
-            Span::styled("  XP earned  ", Style::default().fg(Color::DarkGray)),
+            Span::styled("  Sats earned  ", Style::default().fg(Color::DarkGray)),
             Span::styled(
                 format!("+{animated_xp}"),
                 Style::default()
@@ -331,7 +331,7 @@ fn draw_chapter_complete(
         )),
         Line::from(""),
         Line::from(vec![
-            Span::styled("  Total XP   ", Style::default().fg(Color::DarkGray)),
+            Span::styled("  Total Sats ", Style::default().fg(Color::DarkGray)),
             Span::styled(
                 format!("{}", app.total_xp()),
                 Style::default()
@@ -340,7 +340,7 @@ fn draw_chapter_complete(
             ),
         ]),
         Line::from(vec![
-            Span::styled("  Rank       ", Style::default().fg(Color::DarkGray)),
+            Span::styled("  Title      ", Style::default().fg(Color::DarkGray)),
             Span::styled(
                 app.rank(),
                 Style::default()
@@ -350,7 +350,7 @@ fn draw_chapter_complete(
         ]),
         Line::from(""),
         Line::from(Span::styled(
-            "  [Enter] Next chapter",
+            "  [Enter] Next Block",
             Style::default()
                 .fg(Color::DarkGray)
                 .add_modifier(Modifier::ITALIC),
@@ -360,14 +360,14 @@ fn draw_chapter_complete(
     // Attempts penalty note
     if app.chapter_state.attempts > 1 {
         lines.push(Line::from(Span::styled(
-            format!("  ({} attempts — XP adjusted)", app.chapter_state.attempts),
+            format!("  ({} attempts — Sats adjusted)", app.chapter_state.attempts),
             Style::default().fg(Color::Rgb(180, 140, 60)),
         )));
     }
     if app.chapter_state.hint_level > 0 {
         lines.push(Line::from(Span::styled(
             format!(
-                "  ({} hints used — XP adjusted)",
+                "  ({} hints used — Sats adjusted)",
                 app.chapter_state.hint_level
             ),
             Style::default().fg(Color::Rgb(100, 160, 200)),
@@ -434,7 +434,7 @@ fn draw_volume_complete(frame: &mut Frame, app: &App, vol_idx: usize, border_bre
         )),
         Line::from(""),
         Line::from(vec![
-            Span::styled("  Volume XP  ", Style::default().fg(Color::DarkGray)),
+            Span::styled("  Vol Sats   ", Style::default().fg(Color::DarkGray)),
             Span::styled(
                 format!("{vol_xp}"),
                 Style::default()
@@ -443,7 +443,7 @@ fn draw_volume_complete(frame: &mut Frame, app: &App, vol_idx: usize, border_bre
             ),
         ]),
         Line::from(vec![
-            Span::styled("  Total XP   ", Style::default().fg(Color::DarkGray)),
+            Span::styled("  Total Sats ", Style::default().fg(Color::DarkGray)),
             Span::styled(
                 format!("{}", app.total_xp()),
                 Style::default()
@@ -452,7 +452,7 @@ fn draw_volume_complete(frame: &mut Frame, app: &App, vol_idx: usize, border_bre
             ),
         ]),
         Line::from(vec![
-            Span::styled("  Rank       ", Style::default().fg(Color::DarkGray)),
+            Span::styled("  Title      ", Style::default().fg(Color::DarkGray)),
             Span::styled(
                 app.rank(),
                 Style::default()
@@ -576,7 +576,7 @@ fn draw_game_complete(frame: &mut Frame, app: &App, border_breathe: Color) {
                 Style::default().fg(Color::Rgb(80, 180, 80)),
             ),
             Span::styled(
-                format!(" {vol_xp:>4} XP"),
+                format!(" {vol_xp:>4} Sats"),
                 Style::default()
                     .fg(Color::Cyan)
                     .add_modifier(Modifier::BOLD),
@@ -586,7 +586,7 @@ fn draw_game_complete(frame: &mut Frame, app: &App, border_breathe: Color) {
 
     lines.push(Line::from(""));
     lines.push(Line::from(vec![
-        Span::styled("  Total XP   ", Style::default().fg(Color::DarkGray)),
+        Span::styled("  Total Sats ", Style::default().fg(Color::DarkGray)),
         Span::styled(
             format!("{}", app.total_xp()),
             Style::default()
@@ -595,7 +595,7 @@ fn draw_game_complete(frame: &mut Frame, app: &App, border_breathe: Color) {
         ),
     ]));
     lines.push(Line::from(vec![
-        Span::styled("  Final Rank  ", Style::default().fg(Color::DarkGray)),
+        Span::styled("  Final Title ", Style::default().fg(Color::DarkGray)),
         Span::styled(
             app.rank(),
             Style::default()
@@ -605,7 +605,7 @@ fn draw_game_complete(frame: &mut Frame, app: &App, border_breathe: Color) {
     ]));
     lines.push(Line::from(""));
     lines.push(Line::from(Span::styled(
-        "  The real git adventure starts now. Go ship something.",
+        "  Stay humble. Stack sats. Verify everything.",
         Style::default()
             .fg(Color::Rgb(140, 180, 140))
             .add_modifier(Modifier::ITALIC),

@@ -3,7 +3,7 @@
 //! Renders the main gameplay screen for a given chapter. The layout is:
 //!
 //!   ┌──────────────────────────────────────────────────────────────────┐
-//!   │ HUD: Vol N · Ch N · title          XP: NNN  [?] Hint [^C] Quit │
+//!   │ HUD: Vol N · Ch N · title        Sats: NNN  [?] Hint [^C] Quit │
 //!   ├────────────────────┬─────────────────────────────────────────────┤
 //!   │  ASCII ART (left)  │  NPC DIALOGUE (right top)                  │
 //!   │  8 lines tall      ├─────────────────────────────────────────────┤
@@ -32,8 +32,8 @@ use crate::volumes::Chapter;
 /// Dark space background used throughout the screen.
 const BG: Color = Color::Rgb(10, 10, 18);
 
-/// NovaTech corporate orange — borders, accents.
-const ACCENT: Color = Color::Rgb(255, 120, 40);
+/// Bitcoin Orange — borders, accents.
+const ACCENT: Color = Color::Rgb(247, 147, 26);
 
 /// Success / correct-answer green.
 const GREEN: Color = Color::Rgb(60, 220, 100);
@@ -41,8 +41,8 @@ const GREEN: Color = Color::Rgb(60, 220, 100);
 /// Error / wrong-answer red.
 const RED: Color = Color::Rgb(220, 60, 60);
 
-/// NPC name highlight colour (bold orange-yellow).
-const NPC_NAME_COLOR: Color = Color::Rgb(255, 200, 80);
+/// Mentor name highlight colour (bold orange-yellow).
+const MENTOR_NAME_COLOR: Color = Color::Rgb(255, 200, 80);
 
 /// Terminal-pane background — slightly darker than the global BG.
 const TERM_BG: Color = Color::Rgb(8, 8, 14);
@@ -103,7 +103,7 @@ impl ChapterState {
 /// * `frame`   - The ratatui frame to draw into.
 /// * `vol_num` - 1-indexed volume number shown in the HUD.
 /// * `ch_num`  - 1-indexed chapter number shown in the HUD.
-/// * `chapter` - Chapter data (NPC, ASCII art, dialogue, task, hints, XP).
+/// * `chapter` - Chapter data (mentor, ASCII art, dialogue, objective, hints, Sats).
 /// * `state`   - Current mutable-but-read-only-for-rendering player state.
 #[allow(clippy::too_many_arguments)]
 pub fn draw_chapter(
@@ -233,7 +233,7 @@ fn draw_timer_bar(
 
 // ── HUD bar ───────────────────────────────────────────────────────────────────
 
-/// Draw the top HUD bar:  `Vol N · Ch N · title   XP: NNN  [?] Hint  [^C] Quit`
+/// Draw the top HUD bar:  `Vol N · Ch N · title   Sats: NNN  [?] Hint  [^C] Quit`
 #[allow(clippy::too_many_arguments)]
 fn draw_hud(
     frame: &mut Frame,
@@ -252,14 +252,14 @@ fn draw_hud(
     // Left portion: breadcrumb + difficulty badge
     let diff_badge = format!("[{}] ", difficulty.short());
 
-    // Right portion: XP + keybind hints
-    let xp_str = format!(
-        "XP: {:>4} (+{})  [?] Hint  [Ctrl+C] Quit ",
+    // Right portion: Sats + keybind hints
+    let sats_str = format!(
+        "Sats: {:>4} (+{})  [?] Hint  [Ctrl+C] Quit ",
         total_xp, chapter.xp
     );
 
     // Split HUD horizontally: left fills, right is fixed
-    let right_len = xp_str.chars().count() as u16;
+    let right_len = sats_str.chars().count() as u16;
     let cols = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Min(10), Constraint::Length(right_len)])
@@ -289,9 +289,9 @@ fn draw_hud(
     );
     frame.render_widget(left_para, cols[0]);
 
-    // Right: XP + keys in dark-gray
+    // Right: Sats + keys in dark-gray
     let right_line = Line::from(vec![
-        Span::styled("XP: ", Style::default().fg(Color::DarkGray)),
+        Span::styled("Sats: ", Style::default().fg(Color::DarkGray)),
         Span::styled(
             format!("{:>3}", chapter.xp),
             Style::default()
@@ -333,7 +333,7 @@ fn draw_mid(frame: &mut Frame, chapter: &Chapter, state: &ChapterState, area: Re
         .split(area);
 
     draw_ascii_art(frame, chapter, cols[0]);
-    draw_npc_and_task(frame, chapter, state, cols[1]);
+    draw_mentor_and_objective(frame, chapter, state, cols[1]);
 }
 
 /// Render the ASCII art panel on the left.
@@ -360,7 +360,7 @@ fn draw_ascii_art(frame: &mut Frame, chapter: &Chapter, area: Rect) {
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::Rgb(40, 80, 50)))
         .title(Span::styled(
-            " Scene ",
+            " Block View ",
             Style::default().fg(Color::Rgb(100, 200, 130)),
         ))
         .style(Style::default().bg(BG));
@@ -371,7 +371,7 @@ fn draw_ascii_art(frame: &mut Frame, chapter: &Chapter, area: Rect) {
 
 /// Render the NPC dialogue (top-right) and task prompt (bottom-right) stacked
 /// inside the right column of the middle area.
-fn draw_npc_and_task(frame: &mut Frame, chapter: &Chapter, _state: &ChapterState, area: Rect) {
+fn draw_mentor_and_objective(frame: &mut Frame, chapter: &Chapter, _state: &ChapterState, area: Rect) {
     if area.width < 4 || area.height < 4 {
         return;
     }
@@ -389,12 +389,12 @@ fn draw_npc_and_task(frame: &mut Frame, chapter: &Chapter, _state: &ChapterState
         ])
         .split(area);
 
-    draw_npc_dialogue(frame, chapter, right_rows[0]);
-    draw_task_prompt(frame, chapter, right_rows[1]);
+    draw_mentor_dialogue(frame, chapter, right_rows[0]);
+    draw_objective(frame, chapter, right_rows[1]);
 }
 
 /// Render the NPC name and speech bubble dialogue lines.
-fn draw_npc_dialogue(frame: &mut Frame, chapter: &Chapter, area: Rect) {
+fn draw_mentor_dialogue(frame: &mut Frame, chapter: &Chapter, area: Rect) {
     if area.width == 0 || area.height == 0 {
         return;
     }
@@ -409,7 +409,7 @@ fn draw_npc_dialogue(frame: &mut Frame, chapter: &Chapter, area: Rect) {
         Span::styled(
             chapter.npc_name,
             Style::default()
-                .fg(NPC_NAME_COLOR)
+                .fg(MENTOR_NAME_COLOR)
                 .add_modifier(Modifier::BOLD),
         ),
         Span::styled(" ]]", Style::default().fg(Color::Rgb(80, 80, 100))),
@@ -429,28 +429,28 @@ fn draw_npc_dialogue(frame: &mut Frame, chapter: &Chapter, area: Rect) {
         ]));
     }
 
-    let npc_block = Block::default()
+    let mentor_block = Block::default()
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::Rgb(60, 60, 90)))
         .title(Span::styled(
-            " NPC ",
+            " Mentor ",
             Style::default().fg(Color::Rgb(80, 80, 120)),
         ))
         .style(Style::default().bg(BG));
 
-    let npc_para = Paragraph::new(lines).block(npc_block);
-    frame.render_widget(npc_para, area);
+    let mentor_para = Paragraph::new(lines).block(mentor_block);
+    frame.render_widget(mentor_para, area);
 }
 
 /// Render the bright-yellow-bordered task prompt box.
-fn draw_task_prompt(frame: &mut Frame, chapter: &Chapter, area: Rect) {
+fn draw_objective(frame: &mut Frame, chapter: &Chapter, area: Rect) {
     if area.width == 0 || area.height == 0 {
         return;
     }
 
     let task_line = Line::from(vec![
         Span::styled(
-            "> Your task: ",
+            "> Objective: ",
             Style::default()
                 .fg(Color::Rgb(255, 240, 60))
                 .add_modifier(Modifier::BOLD),
@@ -467,7 +467,7 @@ fn draw_task_prompt(frame: &mut Frame, chapter: &Chapter, area: Rect) {
         .borders(Borders::ALL)
         .border_style(Style::default().fg(ACCENT))
         .title(Span::styled(
-            " Task ",
+            " Objective ",
             Style::default()
                 .fg(Color::Rgb(255, 240, 60))
                 .add_modifier(Modifier::BOLD),
@@ -507,7 +507,7 @@ fn draw_terminal(
 
     // Build the input line: prompt + typed text + blinking cursor
     let prompt = Span::styled(
-        "  $ ",
+        "  ₿> ",
         Style::default().fg(GREEN).add_modifier(Modifier::BOLD),
     );
 
@@ -531,7 +531,7 @@ fn draw_terminal(
         .borders(Borders::ALL)
         .border_style(Style::default().fg(border_color))
         .title(Span::styled(
-            " Terminal ",
+            " Node Console ",
             Style::default().fg(border_color),
         ))
         .style(Style::default().bg(bg_color));

@@ -22,8 +22,8 @@ pub struct AnimState {
     #[once(duration = 200, easing = quad_out)]
     pub hint_openness: f64,
 
-    /// XP counter rise on chapter-complete screen.
-    /// Set target to the earned XP when the screen appears.
+    /// Sats counter rise on chapter-complete screen.
+    /// Set target to the earned Sats when the screen appears.
     #[once(duration = 800, easing = cubic_out)]
     pub xp_rise: u32,
 
@@ -79,7 +79,7 @@ impl AnimState {
         self.hint_openness.set(if open { 1.0 } else { 0.0 });
     }
 
-    /// Trigger the XP counter animation from 0 up to `earned`.
+    /// Trigger the Sats counter animation from 0 up to `earned`.
     pub fn start_xp_rise(&mut self, earned: u32) {
         self.xp_rise.set(earned);
     }
