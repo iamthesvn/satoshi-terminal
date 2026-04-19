@@ -323,6 +323,16 @@ impl App {
             }
         }
 
+        // ChapterIntro — prime the typewriter if it hasn't started yet
+        if let AppState::ChapterIntro { vol_idx, ch_idx } = &self.state
+            && let Some(ch) = self.current_chapter(*vol_idx, *ch_idx)
+        {
+            let dialogue = ch.npc_dialogue.join("\n");
+            if self.anim.intro_typewriter.target() != &dialogue {
+                self.anim.intro_typewriter.set(dialogue);
+            }
+        }
+
         // ChapterComplete — animate but do not auto-advance
         if let AppState::ChapterComplete {
             vol_idx,
