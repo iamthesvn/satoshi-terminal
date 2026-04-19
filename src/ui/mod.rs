@@ -297,8 +297,8 @@ fn draw_chapter_complete(
     let revealed_msg: String = ch.success_message.chars().take(msg_chars).collect();
 
     let animated_xp = *app.anim.xp_rise;
-    let xp_bar_filled = ((animated_xp as usize * 20) / (ch.xp as usize).max(1)).min(20);
-    let xp_bar = "▓".repeat(xp_bar_filled) + &"░".repeat(20 - xp_bar_filled);
+    let xp_bar_filled = ((animated_xp as usize * 21) / (ch.xp as usize).max(1)).min(21);
+    let xp_bar = "▓".repeat(xp_bar_filled) + &"░".repeat(21 - xp_bar_filled);
 
     let mut lines = vec![
         Line::from(""),
@@ -504,16 +504,16 @@ fn draw_volume_complete(frame: &mut Frame, app: &App, vol_idx: usize, border_bre
 // ── Game complete ─────────────────────────────────────────────────────────────
 
 const TROPHY: &[&str] = &[
-    r"      ___________      ",
-    r"     '._==_==_=_.'     ",
-    r"     .-\:      /-.     ",
-    r"    | (|:.     |) |    ",
-    r"     '-|:.     |-'     ",
-    r"       \::.    /       ",
-    r"        '::. .'        ",
-    r"          ) (          ",
-    r"        _.' '._        ",
-    r"       '-------'       ",
+    r"    ▓▓▓▓▓▓▓▓▓▓▓▓▓    ",
+    r"    ▓░░░░░░░░░░░▓    ",
+    r"  ▓▓▓▓▓▓░░▓▓▓▓▓▓▓▓  ",
+    r"  ▓░░░░░░░░░░░░░░░▓  ",
+    r"  ▓▓▓▓▓▓░░▓▓▓▓▓▓▓▓  ",
+    r"  ▓░░░░░░░░░░░░░░░▓  ",
+    r"    ▓░░░░░░░░░░░▓    ",
+    r"    ▓▓▓▓▓▓▓▓▓▓▓▓▓    ",
+    r"         ▓▓▓         ",
+    r"      ██████████      ",
 ];
 
 fn draw_game_complete(frame: &mut Frame, app: &App, border_breathe: Color) {
@@ -563,8 +563,8 @@ fn draw_game_complete(frame: &mut Frame, app: &App, border_breathe: Color) {
             .get(vi)
             .map(|v| v.iter().sum::<u32>())
             .unwrap_or(0);
-        let filled = ((vol_xp as usize * 16) / 150).min(16);
-        let bar = "▓".repeat(filled) + &"░".repeat(16 - filled);
+        let filled = ((vol_xp as usize * 21) / 150).min(21);
+        let bar = "▓".repeat(filled) + &"░".repeat(21 - filled);
         lines.push(Line::from(vec![
             Span::styled(format!("  Vol {} ", vi + 1), Style::default().fg(ACCENT)),
             Span::styled(

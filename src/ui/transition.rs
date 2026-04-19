@@ -5,17 +5,17 @@ use ratatui::{
     widgets::Paragraph,
 };
 
-// Bitcoin logo tile — same 7×7 footprint as the original GitQuest diamond,
-// but without the box-drawing border.  Just a single ₿ centred in empty space.
+// Bitcoin block tile — a denser 7×7 pattern with the ₿ symbol
+// surrounded by hash-zero characters, like a mined block header.
 
 const LOGO_ROWS: &[&str] = &[
-    "       ",
-    "       ",
-    "       ",
-    "   ₿   ",
-    "       ",
-    "       ",
-    "       ",
+    " 000000 ",
+    "0  ₿₿  0",
+    "0 ₿  ₿ 0",
+    "0  ₿₿  0",
+    "0 ₿  ₿ 0",
+    "0  ₿₿  0",
+    " 000000 ",
 ];
 
 const TILE_H: usize = 7;
