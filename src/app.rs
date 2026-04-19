@@ -10,6 +10,7 @@ use std::{
     io,
     time::{Duration, Instant},
 };
+use tui_overlay::{Easing, OverlayState};
 
 use crate::ui::chapter::ChapterState;
 use crate::{
@@ -238,6 +239,50 @@ pub enum AppState {
     Quit,
 }
 
+// ── Toast ─────────────────────────────────────────────────────────────────────
+
+/// Speed-bonus toast notification using tui-overlay.
+pub struct Toast {
+    pub overlay: OverlayState,
+    pub message: String,
+    pub hold_ticks: u8,
+}
+
+impl Toast {
+    pub fn new() -> Self {
+        let overlay = OverlayState::new()
+            .with_duration(Duration::from_millis(200))
+            .with_easing(Easing::EaseOut);
+        Self {
+            overlay,
+            message: String::new(),
+            hold_ticks: 0,
+        }
+    }
+
+    /// Show a new toast message. Replaces any existing toast.
+    pub fn show(&mut self, message: String) {
+        self.message = message;
+        self.hold_ticks = 25; // 2.5s hold at 100ms tick rate
+        self.overlay.open();
+    }
+
+    /// Advance animation and auto-close after hold expires.
+    pub fn tick(&mut self) {
+        self.overlay.tick(Duration::from_millis(100));
+        if self.overlay.is_open() && self.hold_ticks > 0 {
+            self.hold_ticks -= 1;
+            if self.hold_ticks == 0 {
+                self.overlay.close();
+            }
+        }
+    }
+
+    pub fn is_visible(&self) -> bool {
+        !self.overlay.is_closed()
+    }
+}
+
 // ── App ───────────────────────────────────────────────────────────────────────
 
 pub struct App {
@@ -249,6 +294,7 @@ pub struct App {
     pub chapter_state: ChapterState,
     pub anim: AnimState,
     pub anim_tick: usize,
+    pub toast: Toast,
     music_tick_counter: u8,
 }
 
@@ -264,6 +310,7 @@ impl App {
             chapter_state: ChapterState::new(),
             anim: AnimState::init(),
             anim_tick: 0,
+            toast: Toast::new(),
             music_tick_counter: 0,
         }
     }
@@ -293,6 +340,7 @@ impl App {
 
     pub fn tick(&mut self) {
         self.anim.animate();
+        self.toast.tick();
         self.anim_tick = self.anim_tick.wrapping_add(1);
 
         // Decay flash timers
@@ -619,6 +667,7 @@ impl App {
                         .max(chapter.xp * diff.floor_pct() / 100);
 
                     // Speed bonus on Easy / Normal (not Hard)
+                    let mut speed_bonus = 0;
                     if diff != Difficulty::Hard {
                         let total_ticks = chapter.time_limit_secs.saturating_mul(10);
                         if total_ticks > 0 && self.chapter_state.time_remaining_ticks > 0 {
@@ -628,9 +677,13 @@ impl App {
                                 Difficulty::Easy => 0.30,
                                 _ => 0.20,
                             };
-                            let bonus = (chapter.xp as f32 * ratio * bonus_pct) as u32;
-                            xp += bonus;
+                            speed_bonus = (chapter.xp as f32 * ratio * bonus_pct) as u32;
+                            xp += speed_bonus;
                         }
+                    }
+
+                    if speed_bonus > 0 {
+                        self.toast.show(format!("⚡ Speed bonus +{speed_bonus} Sats"));
                     }
 
                     self.save.record_chapter(vol_idx, ch_idx, xp);

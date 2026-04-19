@@ -11,6 +11,7 @@ use ratatui::{
     text::{Line, Span},
     widgets::{Block, Borders, Paragraph},
 };
+use tui_overlay::{Anchor, Overlay, Slide};
 
 use crate::app::{App, AppState};
 
@@ -75,6 +76,40 @@ pub fn draw(frame: &mut Frame, app: &App) {
             draw_game_complete(frame, app, *app.anim.border_breathe);
         }
         AppState::Quit => {}
+    }
+
+    // ── Toast overlay (rendered on top of everything) ──────────────────────────
+    if app.toast.is_visible() {
+        let toast_overlay = Overlay::new()
+            .anchor(Anchor::TopRight)
+            .slide(Slide::Top)
+            .width(Constraint::Length(34))
+            .height(Constraint::Length(3))
+            .bg(Color::Rgb(20, 20, 35))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(ACCENT))
+                    .title(Span::styled(
+                        " Network ",
+                        Style::default().fg(ACCENT).add_modifier(Modifier::BOLD),
+                    )),
+            );
+
+        // Need a mutable copy of overlay state for rendering
+        let mut state = app.toast.overlay.clone();
+        frame.render_stateful_widget(toast_overlay, frame.area(), &mut state);
+
+        if let Some(inner) = state.inner_area() {
+            let text = Paragraph::new(Line::from(vec![Span::styled(
+                app.toast.message.as_str(),
+                Style::default()
+                    .fg(Color::Rgb(255, 215, 0))
+                    .add_modifier(Modifier::BOLD),
+            )]))
+            .alignment(Alignment::Center);
+            frame.render_widget(text, inner);
+        }
     }
 }
 
