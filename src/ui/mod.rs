@@ -81,7 +81,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
     // ── Toast overlay (rendered on top of everything) ──────────────────────────
     if app.toast.is_visible() {
         let toast_overlay = Overlay::new()
-            .anchor(Anchor::TopRight)
+            .anchor(Anchor::Top)
             .slide(Slide::Top)
             .width(Constraint::Length(34))
             .height(Constraint::Length(3))
