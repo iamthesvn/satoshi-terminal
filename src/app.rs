@@ -102,8 +102,7 @@ impl SaveData {
         {
             let vol_idx = json["vol_idx"].as_u64().unwrap_or(0) as usize;
             let ch_idx = json["ch_idx"].as_u64().unwrap_or(0) as usize;
-            let total_xp = json["total_xp"].as_u64().unwrap_or(0) as u32;
-            let xp_per_chapter = json["xp_per_chapter"]
+            let xp_per_chapter: Vec<Vec<u32>> = json["xp_per_chapter"]
                 .as_array()
                 .map(|vols| {
                     vols.iter()
@@ -117,6 +116,11 @@ impl SaveData {
                         .collect()
                 })
                 .unwrap_or_default();
+            // Derive total_xp from the per-chapter vec rather than trusting JSON
+            let total_xp = xp_per_chapter
+                .iter()
+                .flat_map(|v| v.iter().copied())
+                .sum();
             let difficulty = json["difficulty"]
                 .as_str()
                 .map(|s| match s {
@@ -506,6 +510,7 @@ impl App {
                     0 => {
                         // New Game → difficulty select
                         self.save.reset();
+                        self.save.save();
                         self.state = AppState::DifficultySelect { selected: 1 };
                     }
                     1 => {
@@ -719,16 +724,35 @@ impl App {
         if key.code == KeyCode::Enter || key.code == KeyCode::Char(' ') {
             let next = vol_idx + 1;
             if next < self.volumes.len() {
+                // Advance save so Continue sends player to the next volume
+                self.save.vol_idx = next;
+                self.save.ch_idx = 0;
+                self.save.save();
                 self.chapter_state = ChapterState::new();
                 self.state = AppState::ChapterIntro {
                     vol_idx: next,
                     ch_idx: 0,
                 };
             } else {
+                // All volumes complete — pin save at the end
+                self.save.vol_idx = vol_idx;
+                self.save.ch_idx = self.volumes[vol_idx].chapters.len();
+                self.save.save();
                 self.state = AppState::GameComplete;
             }
         }
         if key.code == KeyCode::Esc || key.code == KeyCode::Char('q') {
+            // Player bailed from VolumeComplete — still advance save so they
+            // don't get trapped replaying the last chapter of this volume.
+            let next = vol_idx + 1;
+            if next < self.volumes.len() {
+                self.save.vol_idx = next;
+                self.save.ch_idx = 0;
+            } else {
+                self.save.vol_idx = vol_idx;
+                self.save.ch_idx = self.volumes[vol_idx].chapters.len();
+            }
+            self.save.save();
             self.state = AppState::Menu { selected: 0 };
         }
     }
