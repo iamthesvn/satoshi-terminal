@@ -9,7 +9,7 @@ categories = ["games", "command-line-utilities"]
 readme = "README.md"
 
 [[bin]]
-name = "satoshi"
+name = "satoshi-terminal"
 path = "src/main.rs"
 
 [dependencies]
