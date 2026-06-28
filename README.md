@@ -1,6 +1,6 @@
 # Satoshi's Terminal
 
-> Learn Bitcoin by living it. A terminal game where every answer unlocks the protocol one block at a time.
+> A **TUI (terminal user interface)** game for learning Bitcoin. Runs entirely in your terminal — no GUI, just text, color, and ASCII art.
 
 ```
  ██████╗  █████╗  ████████╗  ██████╗   ██████╗ ██╗  ██╗  ██╗  ██╗  ██████╗
@@ -38,9 +38,9 @@ Requires Rust stable (1.75+). No external dependencies — audio is synthesised 
 
 ## The story — Satoshi Labs
 
-Satoshi's Terminal is structured as **5 volumes** covering the full Bitcoin protocol stack
-(36 chapters total). Each chapter drops you into a concept, asks you a question, or
-has you type a real `bitcoin-cli` command.
+Satoshi's Terminal is structured as multiple volumes covering the full Bitcoin protocol stack.
+Each chapter drops you into a concept, asks you a question, or has you type a real `bitcoin-cli`
+command.
 
 ### Volume 1 — Foundations
 *"Before you stack sats, you must understand the protocol."*
@@ -131,7 +131,7 @@ Every chapter has **3 tiered hints** — you decide how much help you want.
 | `Tab` | Reveal the next hint tier (only when panel is open) |
 
 Hints go from vague nudge → concept category → near-exact answer.
-Each hint used costs a small XP penalty. You always earn at least 25% of the base XP.
+Each hint used costs a small Sats penalty. You always earn at least 25% of the base Sats.
 
 ---
 
@@ -152,16 +152,16 @@ Each hint used costs a small XP penalty. You always earn at least 25% of the bas
 
 ## Scoring
 
-- Each chapter has a base XP value (10–35 XP depending on difficulty)
-- **-2 XP** per extra attempt after the first
-- **-3 XP** per hint tier revealed
+- Each chapter has a base Sats value depending on difficulty
+- **-2 Sats** per extra attempt after the first
+- **-3 Sats** per hint tier revealed
 - Score floors at **25%** of base — you always earn something
 - Answers are matched case-insensitively with collapsed whitespace, so minor formatting differences don't count as wrong
 
-**Ranks** (total XP across all 36 chapters):
+**Titles** (total Sats across all chapters):
 
-| XP | Rank |
-|----|------|
+| Sats | Title |
+|------|-------|
 | 0–49 | Curious Observer |
 | 50–149 | Wallet Holder |
 | 150–299 | Transaction Builder |
@@ -175,8 +175,8 @@ Each hint used costs a small XP penalty. You always earn at least 25% of the bas
 ## Features
 
 - Narrative-driven gameplay — real mentors, real protocol tension
-- **5 volumes × 36 chapters** covering Bitcoin from whitepaper to Lightning
-- 3-tier hint system with XP penalty — not hand-holding, just scaffolding
+- Multiple volumes of chapters covering Bitcoin from whitepaper to Lightning
+- 3-tier hint system with Sats penalty — not hand-holding, just scaffolding
 - Synthesised ambient music (3 Bitcoin-themed tracks) + sound effects via `rodio` — no audio files
 - ₿ tile-flood transition animation between chapters
 - Save / continue system at `~/.satoshi-terminal/save.json`
