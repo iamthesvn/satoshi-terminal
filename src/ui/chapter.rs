@@ -179,13 +179,13 @@ pub fn draw_chapter(
     // because we provided at least 4 constraints above.
     draw_timer_bar(frame, chapter, state, rows[0], difficulty);
     draw_hud(
-        frame, vol_num, ch_num, chapter, state, rows[1], total_xp, difficulty,
+        frame, vol_num, ch_num, chapter, rows[1], total_xp, difficulty,
     );
     draw_mid(frame, chapter, state, rows[2]);
-    draw_terminal(frame, chapter, state, rows[3], anim);
+    draw_terminal(frame, state, rows[3], anim);
 
     if show_hint_anim && let Some(hint_area) = rows.get(4) {
-        draw_hints(frame, chapter, state, *hint_area, anim);
+        draw_hints(frame, chapter, state, *hint_area);
     }
 }
 
@@ -240,7 +240,6 @@ fn draw_hud(
     vol_num: usize,
     ch_num: usize,
     chapter: &Chapter,
-    _state: &ChapterState,
     area: Rect,
     total_xp: u32,
     difficulty: crate::app::Difficulty,
@@ -315,7 +314,7 @@ fn draw_hud(
 // ── Middle area: ASCII art (left) + NPC dialogue + Task (right) ───────────────
 
 /// Draw the two-panel middle section.
-fn draw_mid(frame: &mut Frame, chapter: &Chapter, state: &ChapterState, area: Rect) {
+fn draw_mid(frame: &mut Frame, chapter: &Chapter, _state: &ChapterState, area: Rect) {
     if area.width < 4 || area.height < 2 {
         return;
     }
@@ -333,7 +332,7 @@ fn draw_mid(frame: &mut Frame, chapter: &Chapter, state: &ChapterState, area: Re
         .split(area);
 
     draw_ascii_art(frame, chapter, cols[0]);
-    draw_mentor_and_objective(frame, chapter, state, cols[1]);
+    draw_mentor_and_objective(frame, chapter, cols[1]);
 }
 
 /// Render the ASCII art panel on the left.
@@ -369,9 +368,9 @@ fn draw_ascii_art(frame: &mut Frame, chapter: &Chapter, area: Rect) {
     frame.render_widget(art_para, area);
 }
 
-/// Render the NPC dialogue (top-right) and task prompt (bottom-right) stacked
+/// Render the mentor dialogue (top-right) and task prompt (bottom-right) stacked
 /// inside the right column of the middle area.
-fn draw_mentor_and_objective(frame: &mut Frame, chapter: &Chapter, _state: &ChapterState, area: Rect) {
+fn draw_mentor_and_objective(frame: &mut Frame, chapter: &Chapter, area: Rect) {
     if area.width < 4 || area.height < 4 {
         return;
     }
@@ -487,7 +486,6 @@ fn draw_objective(frame: &mut Frame, chapter: &Chapter, area: Rect) {
 /// * `flash_correct`> 0: green border.
 fn draw_terminal(
     frame: &mut Frame,
-    _chapter: &Chapter,
     state: &ChapterState,
     area: Rect,
     anim: &AnimState,
@@ -552,7 +550,6 @@ fn draw_hints(
     chapter: &Chapter,
     state: &ChapterState,
     area: Rect,
-    _anim: &AnimState,
 ) {
     if area.width == 0 || area.height == 0 {
         return;

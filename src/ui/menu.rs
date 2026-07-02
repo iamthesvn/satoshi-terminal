@@ -27,7 +27,7 @@ const LOGO_ART: &[&str] = &[
 const MENU_ITEMS: &[&str] = &["     Boot Node", "     Sync Progress", "     Power Down"];
 
 pub fn draw_menu(frame: &mut Frame, area: Rect, selected: usize, border_breathe: Color) {
-    // Wide enough for QUEST logo (44 chars) + padding
+    // Wide enough for Satoshi's Terminal logo (76 cols) + padding
     let horizontal = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([

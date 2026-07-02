@@ -4,8 +4,8 @@
 ///   1. SoundManager — one-shot sound effects (keypress, correct, error, etc.)
 ///   2. MusicPlayer  — continuous looping ambient background music with mute toggle
 ///
-/// Design mirrors rebels-in-the-sky: _stream kept alive in struct so audio
-/// device is not dropped. Sink::pause()/play() for instant mute/unmute.
+/// The output stream is kept alive inside the manager structs so the audio
+/// device is not dropped. Sink::pause()/play() provides instant mute/unmute.
 pub mod music_player;
 
 pub use music_player::MusicPlayer;
@@ -133,62 +133,4 @@ fn play_synth(handle: &OutputStreamHandle, sound: Sound) {
     }
 
     sink.detach();
-}
-
-// ── Synth oscillator (used by MusicPlayer too) ────────────────────────────────
-
-/// Simple sine-wave oscillator that `Source` uses.
-#[allow(dead_code)]
-pub struct SynthSource {
-    pub freq: f32,
-    pub amplitude: f32,
-    pub sample_rate: u32,
-    pub total_samples: u32,
-    pub current_sample: u32,
-}
-
-impl SynthSource {
-    #[allow(dead_code)]
-    pub fn new(freq: f32, duration_secs: f32, amplitude: f32) -> Self {
-        let sample_rate = 44_100u32;
-        Self {
-            freq,
-            amplitude,
-            sample_rate,
-            total_samples: (sample_rate as f32 * duration_secs) as u32,
-            current_sample: 0,
-        }
-    }
-}
-
-impl Iterator for SynthSource {
-    type Item = f32;
-
-    fn next(&mut self) -> Option<f32> {
-        if self.current_sample >= self.total_samples {
-            return None;
-        }
-        let t = self.current_sample as f32 / self.sample_rate as f32;
-        let env = 1.0 - (self.current_sample as f32 / self.total_samples as f32);
-        let sample = (2.0 * std::f32::consts::PI * self.freq * t).sin() * env * self.amplitude;
-        self.current_sample += 1;
-        Some(sample)
-    }
-}
-
-impl rodio::source::Source for SynthSource {
-    fn current_frame_len(&self) -> Option<usize> {
-        None
-    }
-    fn channels(&self) -> u16 {
-        1
-    }
-    fn sample_rate(&self) -> u32 {
-        self.sample_rate
-    }
-    fn total_duration(&self) -> Option<Duration> {
-        Some(Duration::from_secs_f32(
-            self.total_samples as f32 / self.sample_rate as f32,
-        ))
-    }
 }

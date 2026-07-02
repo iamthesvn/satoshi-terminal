@@ -1,7 +1,7 @@
 // app.rs — Satoshi's Terminal state machine, event loop, and save system.
 //
 // State flow:
-//   Menu → VolumeSelect → ChapterIntro → Playing → ChapterComplete
+//   Menu → DifficultySelect → ChapterIntro → Playing → ChapterComplete
 //       → (next chapter) or VolumeComplete → GameComplete
 
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
@@ -34,15 +34,6 @@ pub enum Difficulty {
 }
 
 impl Difficulty {
-    #[allow(dead_code)]
-    pub fn label(&self) -> &'static str {
-        match self {
-            Difficulty::Easy => "Easy",
-            Difficulty::Normal => "Normal",
-            Difficulty::Hard => "Hard",
-        }
-    }
-
     pub fn short(&self) -> &'static str {
         match self {
             Difficulty::Easy => "E",
@@ -205,10 +196,6 @@ pub enum AppState {
     },
     /// Difficulty selection after New Game
     DifficultySelect {
-        selected: usize,
-    },
-    /// Volume selection screen
-    VolumeSelect {
         selected: usize,
     },
     /// Full-screen chapter intro — shows volume + chapter title, NPC first line, press Enter
@@ -481,12 +468,11 @@ impl App {
         match self.state.clone() {
             AppState::Menu { selected } => self.handle_menu(key, selected),
             AppState::DifficultySelect { selected } => self.handle_difficulty_select(key, selected),
-            AppState::VolumeSelect { selected } => self.handle_volume_select(key, selected),
             AppState::ChapterIntro { vol_idx, ch_idx } => self.handle_intro(key, vol_idx, ch_idx),
             AppState::Playing { vol_idx, ch_idx } => self.handle_playing(key, vol_idx, ch_idx),
             AppState::ChapterComplete {
                 vol_idx, ch_idx, ..
-            } => self.handle_chapter_complete(key, vol_idx, ch_idx),
+            } => self.handle_chapter_complete(vol_idx, ch_idx),
             AppState::VolumeComplete { vol_idx } => self.handle_volume_complete(key, vol_idx),
             AppState::GameComplete => self.handle_game_complete(key),
             AppState::Transition { .. } => {} // no keys during transition
@@ -558,33 +544,6 @@ impl App {
                 self.chapter_state = ChapterState::new();
                 self.state = AppState::ChapterIntro {
                     vol_idx: 0,
-                    ch_idx: 0,
-                };
-            }
-            KeyCode::Esc | KeyCode::Char('q') => {
-                self.state = AppState::Menu { selected: 0 };
-            }
-            _ => {}
-        }
-    }
-
-    fn handle_volume_select(&mut self, key: KeyEvent, selected: usize) {
-        let max = self.volumes.len().saturating_sub(1);
-        match key.code {
-            KeyCode::Up | KeyCode::Char('k') => {
-                self.state = AppState::VolumeSelect {
-                    selected: selected.saturating_sub(1),
-                };
-            }
-            KeyCode::Down | KeyCode::Char('j') => {
-                self.state = AppState::VolumeSelect {
-                    selected: (selected + 1).min(max),
-                };
-            }
-            KeyCode::Enter | KeyCode::Char(' ') => {
-                self.chapter_state = ChapterState::new();
-                self.state = AppState::ChapterIntro {
-                    vol_idx: selected,
                     ch_idx: 0,
                 };
             }
@@ -716,7 +675,7 @@ impl App {
         }
     }
 
-    fn handle_chapter_complete(&mut self, _key: KeyEvent, vol_idx: usize, ch_idx: usize) {
+    fn handle_chapter_complete(&mut self, vol_idx: usize, ch_idx: usize) {
         self.advance_after_complete(vol_idx, ch_idx);
     }
 

@@ -26,9 +26,6 @@ pub fn draw(frame: &mut Frame, app: &App) {
         AppState::DifficultySelect { selected } => {
             menu::draw_difficulty_select(frame, frame.area(), *selected, app.save.difficulty);
         }
-        AppState::VolumeSelect { selected } => {
-            draw_volume_select(frame, app, *selected);
-        }
         AppState::ChapterIntro { vol_idx, ch_idx } => {
             draw_chapter_intro(frame, app, *vol_idx, *ch_idx, app.anim.intro_typewriter.as_str());
         }
@@ -49,11 +46,11 @@ pub fn draw(frame: &mut Frame, app: &App) {
         AppState::ChapterComplete {
             vol_idx,
             ch_idx,
-            earned_xp,
+            earned_xp: _,
             anim_tick,
         } => {
             draw_chapter_complete(
-                frame, app, *vol_idx, *ch_idx, *earned_xp, *anim_tick, *app.anim.success_breathe,
+                frame, app, *vol_idx, *ch_idx, *anim_tick, *app.anim.success_breathe,
             );
         }
         AppState::Transition {
@@ -135,53 +132,6 @@ pub fn draw_resize_warning(frame: &mut Frame) {
         Block::default()
             .borders(Borders::ALL)
             .border_style(Style::default().fg(Color::Yellow)),
-    );
-    frame.render_widget(p, area);
-}
-
-// ── Volume select ─────────────────────────────────────────────────────────────
-
-fn draw_volume_select(frame: &mut Frame, app: &App, selected: usize) {
-    let area = frame.area();
-    let mut lines = vec![
-        Line::from(""),
-        Line::from(Span::styled(
-            "  Select a Volume",
-            Style::default().fg(ACCENT).add_modifier(Modifier::BOLD),
-        )),
-        Line::from(""),
-    ];
-    for (i, vol) in app.volumes.iter().enumerate() {
-        let cursor = if i == selected { "▶ " } else { "  " };
-        let style = if i == selected {
-            Style::default()
-                .fg(Color::White)
-                .add_modifier(Modifier::BOLD)
-        } else {
-            Style::default().fg(Color::Rgb(140, 140, 140))
-        };
-        lines.push(Line::from(Span::styled(
-            format!(
-                "  {}Vol {} — {}   {}",
-                cursor, vol.id, vol.title, vol.tagline
-            ),
-            style,
-        )));
-        lines.push(Line::from(""));
-    }
-    lines.push(Line::from(Span::styled(
-        "  [↑↓] Navigate  [Enter] Select  [Esc] Back",
-        Style::default().fg(Color::DarkGray),
-    )));
-
-    let p = Paragraph::new(lines).style(Style::default().bg(BG)).block(
-        Block::default()
-            .borders(Borders::ALL)
-            .border_style(Style::default().fg(ACCENT))
-            .title(Span::styled(
-                " Satoshi's Terminal — Choose Your Volume ",
-                Style::default().fg(ACCENT).add_modifier(Modifier::BOLD),
-            )),
     );
     frame.render_widget(p, area);
 }
@@ -301,7 +251,7 @@ fn draw_chapter_intro(
             .borders(Borders::ALL)
             .border_style(Style::default().fg(Color::Rgb(50, 50, 80)))
             .title(Span::styled(
-                " Briefing ",
+                " Block Header ",
                 Style::default().fg(ACCENT).add_modifier(Modifier::BOLD),
             )),
     );
@@ -315,7 +265,6 @@ fn draw_chapter_complete(
     app: &App,
     vol_idx: usize,
     ch_idx: usize,
-    _earned_xp: u32,
     anim_tick: usize,
     border_breathe: Color,
 ) {
@@ -516,7 +465,7 @@ fn draw_volume_complete(frame: &mut Frame, app: &App, vol_idx: usize, border_bre
         )));
     } else {
         lines.push(Line::from(Span::styled(
-            "  [Enter] Final chapter →",
+            "  [Enter] View final summary",
             Style::default().fg(Color::DarkGray),
         )));
     }
@@ -583,7 +532,7 @@ fn draw_game_complete(frame: &mut Frame, app: &App, border_breathe: Color) {
     }
     lines.push(Line::from(""));
     lines.push(Line::from(Span::styled(
-        "     You survived NovaTech. Git mastered.",
+        "     You mastered the protocol. Stack secured.",
         Style::default()
             .fg(Color::Rgb(60, 220, 100))
             .add_modifier(Modifier::BOLD),
