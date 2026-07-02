@@ -45,68 +45,68 @@ command.
 ### Volume 1 — Foundations
 *"Before you stack sats, you must understand the protocol."*
 
-| Ch | Title | Answer / Command |
-|----|-------|------------------|
-| 1 | The Whitepaper | `Satoshi Nakamoto` |
-| 2 | Hello Node | `bitcoin-cli getblockchaininfo` |
-| 3 | Block Count | `bitcoin-cli getblockcount` |
-| 4 | Peer Connections | `bitcoin-cli getconnectioncount` |
-| 5 | The Origin Block | `genesis block` |
-| 6 | Explorer | `blockchain explorer` |
+| Ch | Title |
+|----|-------|
+| 1 | The Whitepaper |
+| 2 | Hello Node |
+| 3 | Block Count |
+| 4 | Peer Connections |
+| 5 | The Origin Block |
+| 6 | Explorer |
 
 ### Volume 2 — Keys & Wallets
 *"Not your keys, not your coins."*
 
-| Ch | Title | Answer / Command |
-|----|-------|------------------|
-| 7 | Private Key Secrets | `private key` |
-| 8 | Shareable Identifier | `address` |
-| 9 | The Word List | `seed phrase` |
-| 10 | Wallet Backup | `bitcoin-cli backupwallet` |
-| 11 | Signature Separation | `segwit` |
-| 12 | Native Address Encoding | `bech32` |
+| Ch | Title |
+|----|-------|
+| 7 | Private Key Secrets |
+| 8 | Shareable Identifier |
+| 9 | The Word List |
+| 10 | Wallet Backup |
+| 11 | Signature Separation |
+| 12 | Native Address Encoding |
 
 ### Volume 3 — Transactions
 *"Every transaction tells a story on the blockchain."*
 
-| Ch | Title | Answer / Command |
-|----|-------|------------------|
-| 13 | Unspent Outputs | `utxo` |
-| 14 | Creating Raw TX | `bitcoin-cli createrawtransaction` |
-| 15 | Signing | `bitcoin-cli signrawtransactionwithwallet` |
-| 16 | Broadcasting | `bitcoin-cli sendrawtransaction` |
-| 17 | Shared Control | `multisig` |
-| 18 | Hidden Script Paths | `taproot` |
-| 19 | Miner Incentive | `transaction fee` |
-| 20 | Time-Based Restriction | `locktime` |
-| 21 | Permanent Data Storage | `op_return` |
+| Ch | Title |
+|----|-------|
+| 13 | Unspent Outputs |
+| 14 | Creating Raw TX |
+| 15 | Signing |
+| 16 | Broadcasting |
+| 17 | Shared Control |
+| 18 | Hidden Script Paths |
+| 19 | Miner Incentive |
+| 20 | Time-Based Restriction |
+| 21 | Permanent Data Storage |
 
 ### Volume 4 — Network & Blockchain
 *"The gears that turn every 10 minutes."*
 
-| Ch | Title | Answer / Command |
-|----|-------|------------------|
-| 22 | Transaction Queue | `mempool` |
-| 23 | Proof of Work | `nonce` |
-| 24 | Block Hash | `block hash` |
-| 25 | Difficulty Adjustment | `2016` |
-| 26 | Block Summary Tree | `merkle tree` |
-| 27 | Backward Compatible Upgrade | `soft fork` |
-| 28 | Light Client Verification | `simplified payment verification` |
+| Ch | Title |
+|----|-------|
+| 22 | Transaction Queue |
+| 23 | Proof of Work |
+| 24 | Block Hash |
+| 25 | Difficulty Adjustment |
+| 26 | Block Summary Tree |
+| 27 | Backward Compatible Upgrade |
+| 28 | Light Client Verification |
 
 ### Volume 5 — Mining, Security & Layers
 *"Dig deep, stay secure, and look beyond the base chain."*
 
-| Ch | Title | Answer / Command |
-|----|-------|------------------|
-| 29 | Block Reward Transaction | `coinbase` |
-| 30 | Subsidy Reduction | `halving` |
-| 31 | 21 Million | `21 million` |
-| 32 | Off-Chain Payments | `lightning network` |
-| 33 | Not Your Keys | `coins` |
-| 34 | Collaborative Mining | `mining pool` |
-| 35 | 51% Attack | `51%` |
-| 36 | Air-Gapped Vault | `hardware wallet` |
+| Ch | Title |
+|----|-------|
+| 29 | Block Reward Transaction |
+| 30 | Subsidy Reduction |
+| 31 | 21 Million |
+| 32 | Off-Chain Payments |
+| 33 | Not Your Keys |
+| 34 | Collaborative Mining |
+| 35 | 51% Attack |
+| 36 | Air-Gapped Vault |
 
 ---
 
