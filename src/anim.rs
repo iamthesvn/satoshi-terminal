@@ -25,16 +25,11 @@ pub struct AnimState {
     /// Sats counter rise on chapter-complete screen.
     /// Set target to the earned Sats when the screen appears.
     #[once(duration = 800, easing = cubic_out)]
-    pub xp_rise: u32,
+    pub sats_rise: u32,
 
     /// Transition tile shimmer: brightens/darkens the Bitcoin-orange flood tiles.
     #[alternate(duration = 900, easing = quad_in_out)]
     pub transition_shimmer: u8,
-
-    /// Git graph growth during transitions (0.0 = nothing, 1.0 = full graph).
-    /// Visualises the player's branching knowledge expanding.
-    #[once(duration = 1200, easing = quad_out)]
-    pub graph_growth: f64,
 
     /// Warm border colour that breathes between accent orange and bright gold.
     /// Used on the menu box, volume-complete and game-complete borders.
@@ -46,7 +41,7 @@ pub struct AnimState {
     #[alternate(duration = 1200, easing = quad_in_out)]
     pub success_breathe: Color,
 
-    /// Chapter-intro typewriter: reveals NPC dialogue character-by-character.
+    /// Chapter-intro typewriter: reveals mentor dialogue character-by-character.
     /// Target is set to the full dialogue when entering the intro screen.
     #[once(duration = 2000, easing = quad_out)]
     pub intro_typewriter: String,
@@ -61,7 +56,6 @@ impl AnimState {
             0.0,
             0,
             120,
-            0.0,
             Color::Rgb(255, 120, 40),
             Color::Rgb(60, 220, 100),
             String::new(),
@@ -80,15 +74,14 @@ impl AnimState {
     }
 
     /// Trigger the Sats counter animation from 0 up to `earned`.
-    pub fn start_xp_rise(&mut self, earned: u32) {
-        self.xp_rise.set(earned);
+    pub fn start_sats_rise(&mut self, earned: u32) {
+        self.sats_rise.set(earned);
     }
 
     /// Reset the one-shot animations that are tied to level/chapter transitions.
     pub fn reset_level_anims(&mut self) {
         self.hint_openness.set(0.0);
-        self.xp_rise.set(0);
-        self.graph_growth.set(0.0);
+        self.sats_rise.set(0);
         self.intro_typewriter.set(String::new());
     }
 }

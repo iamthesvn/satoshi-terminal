@@ -76,8 +76,8 @@ impl Difficulty {
 pub struct SaveData {
     pub vol_idx: usize, // 0-based index into volumes vec
     pub ch_idx: usize,  // 0-based index into current volume's chapters
-    pub total_xp: u32,
-    pub xp_per_chapter: Vec<Vec<u32>>, // [vol][ch]
+    pub total_sats: u32,
+    pub sats_per_chapter: Vec<Vec<u32>>, // [vol][ch]
     pub difficulty: Difficulty,
 }
 
@@ -93,7 +93,7 @@ impl SaveData {
         {
             let vol_idx = json["vol_idx"].as_u64().unwrap_or(0) as usize;
             let ch_idx = json["ch_idx"].as_u64().unwrap_or(0) as usize;
-            let xp_per_chapter: Vec<Vec<u32>> = json["xp_per_chapter"]
+            let sats_per_chapter: Vec<Vec<u32>> = json["sats_per_chapter"]
                 .as_array()
                 .map(|vols| {
                     vols.iter()
@@ -107,8 +107,8 @@ impl SaveData {
                         .collect()
                 })
                 .unwrap_or_default();
-            // Derive total_xp from the per-chapter vec rather than trusting JSON
-            let total_xp = xp_per_chapter
+            // Derive total_sats from the per-chapter vec rather than trusting JSON
+            let total_sats = sats_per_chapter
                 .iter()
                 .flat_map(|v| v.iter().copied())
                 .sum();
@@ -123,16 +123,16 @@ impl SaveData {
             return Self {
                 vol_idx,
                 ch_idx,
-                total_xp,
-                xp_per_chapter,
+                total_sats,
+                sats_per_chapter,
                 difficulty,
             };
         }
         Self {
             vol_idx: 0,
             ch_idx: 0,
-            total_xp: 0,
-            xp_per_chapter: vec![],
+            total_sats: 0,
+            sats_per_chapter: vec![],
             difficulty: Difficulty::Normal,
         }
     }
@@ -150,8 +150,8 @@ impl SaveData {
             let json = serde_json::json!({
                 "vol_idx": self.vol_idx,
                 "ch_idx": self.ch_idx,
-                "total_xp": self.total_xp,
-                "xp_per_chapter": self.xp_per_chapter,
+                "total_sats": self.total_sats,
+                "sats_per_chapter": self.sats_per_chapter,
                 "difficulty": diff_str,
             });
             let _ = std::fs::write(&path, json.to_string());
@@ -161,22 +161,22 @@ impl SaveData {
     pub fn reset(&mut self) {
         self.vol_idx = 0;
         self.ch_idx = 0;
-        self.total_xp = 0;
-        self.xp_per_chapter = vec![];
+        self.total_sats = 0;
+        self.sats_per_chapter = vec![];
         // note: difficulty is NOT reset — player keeps their chosen setting
     }
 
-    pub fn record_chapter(&mut self, vol_idx: usize, ch_idx: usize, xp: u32) {
+    pub fn record_chapter(&mut self, vol_idx: usize, ch_idx: usize, sats: u32) {
         // Grow the jagged vec if needed
-        while self.xp_per_chapter.len() <= vol_idx {
-            self.xp_per_chapter.push(vec![]);
+        while self.sats_per_chapter.len() <= vol_idx {
+            self.sats_per_chapter.push(vec![]);
         }
-        while self.xp_per_chapter[vol_idx].len() <= ch_idx {
-            self.xp_per_chapter[vol_idx].push(0);
+        while self.sats_per_chapter[vol_idx].len() <= ch_idx {
+            self.sats_per_chapter[vol_idx].push(0);
         }
-        self.xp_per_chapter[vol_idx][ch_idx] = xp;
-        self.total_xp = self
-            .xp_per_chapter
+        self.sats_per_chapter[vol_idx][ch_idx] = sats;
+        self.total_sats = self
+            .sats_per_chapter
             .iter()
             .flat_map(|v| v.iter().copied())
             .sum();
@@ -198,7 +198,7 @@ pub enum AppState {
     DifficultySelect {
         selected: usize,
     },
-    /// Full-screen chapter intro — shows volume + chapter title, NPC first line, press Enter
+    /// Full-screen chapter intro — shows volume + chapter title, mentor first line, press Enter
     ChapterIntro {
         vol_idx: usize,
         ch_idx: usize,
@@ -317,10 +317,10 @@ impl App {
     }
 
     pub fn total_xp(&self) -> u32 {
-        self.save.total_xp
+        self.save.total_sats
     }
     pub fn rank(&self) -> &'static str {
-        rank_title(self.save.total_xp)
+        rank_title(self.save.total_sats)
     }
 
     pub fn toggle_mute(&mut self) {
@@ -432,7 +432,6 @@ impl App {
             // Next chapter in same volume
             self.sound.play(Sound::Transition);
             self.anim.reset_level_anims();
-            self.anim.graph_growth.set(1.0);
             self.state = AppState::Transition {
                 next_vol: vol_idx,
                 next_ch,
@@ -655,7 +654,7 @@ impl App {
                     self.sound.play(Sound::LevelComplete);
                     self.chapter_state.flash_correct = 8;
                     self.chapter_state.completed = true;
-                    self.anim.start_xp_rise(xp);
+                    self.anim.start_sats_rise(xp);
                     self.state = AppState::ChapterComplete {
                         vol_idx,
                         ch_idx,

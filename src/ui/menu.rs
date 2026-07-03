@@ -108,7 +108,7 @@ pub fn draw_menu(frame: &mut Frame, area: Rect, selected: usize, border_breathe:
                 .borders(Borders::ALL)
                 .border_style(Style::default().fg(border_color))
                 .title(Span::styled(
-                    " Satoshi's Terminal v1.0 ",
+                    " Satoshi's Terminal v0.1.1 ",
                     Style::default()
                         .fg(title_color)
                         .add_modifier(Modifier::BOLD),

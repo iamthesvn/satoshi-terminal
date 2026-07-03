@@ -178,13 +178,13 @@ fn draw_chapter_intro(
                 .borders(Borders::ALL)
                 .border_style(Style::default().fg(Color::Rgb(40, 80, 40)))
                 .title(Span::styled(
-                    " Scene ",
+                    " Block View ",
                     Style::default().fg(Color::Rgb(80, 180, 100)),
                 )),
         );
     frame.render_widget(art_widget, panels[0]);
 
-    // Right: volume header + chapter title + NPC dialogue (typewriter)
+    // Right: volume header + chapter title + mentor dialogue (typewriter)
     let mut lines = vec![
         Line::from(""),
         Line::from(Span::styled(
@@ -280,9 +280,9 @@ fn draw_chapter_complete(
     let msg_chars: usize = (anim_tick * 4).min(ch.success_message.len());
     let revealed_msg: String = ch.success_message.chars().take(msg_chars).collect();
 
-    let animated_xp = *app.anim.xp_rise;
-    let xp_bar_filled = ((animated_xp as usize * 21) / (ch.xp as usize).max(1)).min(21);
-    let xp_bar = "▓".repeat(xp_bar_filled) + &"░".repeat(21 - xp_bar_filled);
+    let animated_sats = *app.anim.sats_rise;
+    let sats_bar_filled = ((animated_sats as usize * 21) / (ch.xp as usize).max(1)).min(21);
+    let sats_bar = "▓".repeat(sats_bar_filled) + &"░".repeat(21 - sats_bar_filled);
 
     let mut lines = vec![
         Line::from(""),
@@ -303,14 +303,14 @@ fn draw_chapter_complete(
         Line::from(vec![
             Span::styled("  Sats earned  ", Style::default().fg(Color::DarkGray)),
             Span::styled(
-                format!("+{animated_xp}"),
+                format!("+{animated_sats}"),
                 Style::default()
                     .fg(Color::Cyan)
                     .add_modifier(Modifier::BOLD),
             ),
         ]),
         Line::from(Span::styled(
-            format!("  [{xp_bar}]"),
+            format!("  [{sats_bar}]"),
             Style::default().fg(Color::Rgb(60, 180, 80)),
         )),
         Line::from(""),
@@ -383,7 +383,7 @@ fn draw_volume_complete(frame: &mut Frame, app: &App, vol_idx: usize, border_bre
 
     let vol_xp: u32 = app
         .save
-        .xp_per_chapter
+        .sats_per_chapter
         .get(vol_idx)
         .map(|v| v.iter().sum::<u32>())
         .unwrap_or(0);
@@ -543,7 +543,7 @@ fn draw_game_complete(frame: &mut Frame, app: &App, border_breathe: Color) {
     for (vi, vol) in app.volumes.iter().enumerate() {
         let vol_xp: u32 = app
             .save
-            .xp_per_chapter
+            .sats_per_chapter
             .get(vi)
             .map(|v| v.iter().sum::<u32>())
             .unwrap_or(0);

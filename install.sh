@@ -1,25 +1,24 @@
 #!/usr/bin/env bash
-# GitQuest installer — builds and installs the `gitquest` binary to ~/.cargo/bin/
-# After running this, type: gitquest
+# Satoshi's Terminal installer — builds and installs the `satoshi-terminal` binary to ~/.cargo/bin/
+# After running this, type: satoshi-terminal
 
 set -e
 
 echo ""
-echo "  ██████╗ ██╗████████╗"
-echo "  ██╔════╝ ██║╚══██╔══╝"
-echo "  ██║  ███╗██║   ██║   "
-echo "  ██║   ██║██║   ██║   "
-echo "  ╚██████╔╝██║   ██║   "
-echo "   ╚═════╝ ╚═╝   ╚═╝   "
+echo "  ███████╗ █████╗ ████████╗ ██████╗ ███████╗██╗  ██╗██╗      ██████╗ ███████╗"
+echo "  ██╔════╝██╔══██╗╚══██╔══╝██╔═══██╗██╔════╝██║  ██║██║     ██╔═══██╗██╔════╝"
+echo "  ███████╗███████║   ██║   ██║   ██║███████╗███████║██║     ██║   ██║█████╗  "
+echo "  ╚════██║██╔══██║   ██║   ██║   ██║╚════██║██╔══██║██║     ██║   ██║██╔══╝  "
+echo "  ███████║██║  ██║   ██║   ╚██████╔╝███████║██║  ██║███████╗╚██████╔╝██║     "
+echo "  ╚══════╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝     "
+echo "                                  ████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██║"
+echo "                                  ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║"
+echo "                                     ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║"
+echo "                                     ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║"
+echo "                                     ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║"
+echo "                                     ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝"
 echo ""
-echo "  ██████╗ ██╗   ██╗███████╗███████╗████████╗"
-echo " ██╔═══██╗██║   ██║██╔════╝██╔════╝╚══██╔══╝"
-echo " ██║   ██║██║   ██║█████╗  ███████╗   ██║   "
-echo " ██║   ██║██║   ██║██╔══╝  ╚════██║   ██║   "
-echo " ╚██████╔╝╚██████╔╝███████╗███████║   ██║   "
-echo "  ╚═════╝  ╚═════╝ ╚══════╝╚══════╝   ╚═╝   "
-echo ""
-echo "  Installing GitQuest — The Codewright Chronicles"
+echo "  Installing Satoshi's Terminal"
 echo ""
 
 # Check for Rust/Cargo
@@ -37,10 +36,10 @@ echo "  ✓ Installation complete!"
 echo ""
 echo "  Run the game with:"
 echo ""
-echo "    gitquest"
+echo "    satoshi-terminal"
 echo ""
-echo "  The binary is at: $(which gitquest 2>/dev/null || echo ~/.cargo/bin/gitquest)"
+echo "  The binary is at: $(which satoshi-terminal 2>/dev/null || echo ~/.cargo/bin/satoshi-terminal)"
 echo ""
-echo "  If 'gitquest' is not found, add ~/.cargo/bin to your PATH:"
+echo "  If 'satoshi-terminal' is not found, add ~/.cargo/bin to your PATH:"
 echo "    export PATH=\"\$HOME/.cargo/bin:\$PATH\""
 echo ""

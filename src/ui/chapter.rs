@@ -5,7 +5,7 @@
 //!   ┌──────────────────────────────────────────────────────────────────┐
 //!   │ HUD: Vol N · Ch N · title        Sats: NNN  [?] Hint [^C] Quit │
 //!   ├────────────────────┬─────────────────────────────────────────────┤
-//!   │  ASCII ART (left)  │  NPC DIALOGUE (right top)                  │
+//!   │  ASCII ART (left)  │  MENTOR DIALOGUE (right top)                  │
 //!   │  8 lines tall      ├─────────────────────────────────────────────┤
 //!   │                    │  TASK PROMPT (bright yellow box)            │
 //!   ├────────────────────┴─────────────────────────────────────────────┤
@@ -113,7 +113,7 @@ pub fn draw_chapter(
     chapter: &Chapter,
     state: &ChapterState,
     anim: &AnimState,
-    total_xp: u32,
+    total_sats: u32,
     difficulty: crate::app::Difficulty,
 ) {
     let area = frame.area();
@@ -126,7 +126,7 @@ pub fn draw_chapter(
     // ── Top-level vertical split ───────────────────────────────────────────
     // Rows (from top to bottom):
     //   [0] HUD bar           — always 1 row tall (inside a border = 3 total)
-    //   [1] Art + NPC + Task  — fills remaining space
+    //   [1] Art + Mentor + Task  — fills remaining space
     //   [2] Terminal input    — 3 rows
     //   [3] Hint panel        — 0 (hidden) or dynamic height
     //
@@ -179,7 +179,7 @@ pub fn draw_chapter(
     // because we provided at least 4 constraints above.
     draw_timer_bar(frame, chapter, state, rows[0], difficulty);
     draw_hud(
-        frame, vol_num, ch_num, chapter, rows[1], total_xp, difficulty,
+        frame, vol_num, ch_num, chapter, rows[1], total_sats, difficulty,
     );
     draw_mid(frame, chapter, state, rows[2]);
     draw_terminal(frame, state, rows[3], anim);
@@ -241,7 +241,7 @@ fn draw_hud(
     ch_num: usize,
     chapter: &Chapter,
     area: Rect,
-    total_xp: u32,
+    total_sats: u32,
     difficulty: crate::app::Difficulty,
 ) {
     if area.width == 0 || area.height == 0 {
@@ -251,10 +251,10 @@ fn draw_hud(
     // Left portion: breadcrumb + difficulty badge
     let diff_badge = format!("[{}] ", difficulty.short());
 
-    // Right portion: Sats + keybind hints
+    // Right portion: total Sats + chapter reward + keybind hints
     let sats_str = format!(
         "Sats: {:>4} (+{})  [?] Hint  [Ctrl+C] Quit ",
-        total_xp, chapter.xp
+        total_sats, chapter.xp
     );
 
     // Split HUD horizontally: left fills, right is fixed
@@ -288,17 +288,17 @@ fn draw_hud(
     );
     frame.render_widget(left_para, cols[0]);
 
-    // Right: Sats + keys in dark-gray
+    // Right: total Sats + chapter reward + keys in dark-gray
     let right_line = Line::from(vec![
         Span::styled("Sats: ", Style::default().fg(Color::DarkGray)),
         Span::styled(
-            format!("{:>3}", chapter.xp),
+            format!("{:>4}", total_sats),
             Style::default()
                 .fg(Color::Cyan)
                 .add_modifier(Modifier::BOLD),
         ),
         Span::styled(
-            "  [?] Hint  [Ctrl+C] Quit ",
+            format!(" (+{})  [?] Hint  [Ctrl+C] Quit ", chapter.xp),
             Style::default().fg(Color::DarkGray),
         ),
     ]);
@@ -311,7 +311,7 @@ fn draw_hud(
     frame.render_widget(right_para, cols[1]);
 }
 
-// ── Middle area: ASCII art (left) + NPC dialogue + Task (right) ───────────────
+// ── Middle area: ASCII art (left) + mentor dialogue + Task (right) ───────────────
 
 /// Draw the two-panel middle section.
 fn draw_mid(frame: &mut Frame, chapter: &Chapter, _state: &ChapterState, area: Rect) {
@@ -319,7 +319,7 @@ fn draw_mid(frame: &mut Frame, chapter: &Chapter, _state: &ChapterState, area: R
         return;
     }
 
-    // Horizontal split: art on the left (~28 cols), NPC+task on the right.
+    // Horizontal split: art on the left (~28 cols), mentor+task on the right.
     let art_width: u16 = 22; // inner art content width
     let left_total = art_width + 2; // +2 for borders
 
@@ -376,7 +376,7 @@ fn draw_mentor_and_objective(frame: &mut Frame, chapter: &Chapter, area: Rect) {
     }
 
     // Decide how to split: task box needs at least 4 rows.
-    // NPC dialogue gets remaining space.
+    // mentor dialogue gets remaining space.
     let task_height: u16 = 4.max(area.height / 3).min(area.height.saturating_sub(4));
     let npc_height = area.height.saturating_sub(task_height);
 
@@ -392,7 +392,7 @@ fn draw_mentor_and_objective(frame: &mut Frame, chapter: &Chapter, area: Rect) {
     draw_objective(frame, chapter, right_rows[1]);
 }
 
-/// Render the NPC name and speech bubble dialogue lines.
+/// Render the mentor name and speech bubble dialogue lines.
 fn draw_mentor_dialogue(frame: &mut Frame, chapter: &Chapter, area: Rect) {
     if area.width == 0 || area.height == 0 {
         return;
@@ -402,7 +402,7 @@ fn draw_mentor_dialogue(frame: &mut Frame, chapter: &Chapter, area: Rect) {
 
     let mut lines: Vec<Line> = Vec::new();
 
-    // NPC name header
+    // Mentor name header
     lines.push(Line::from(vec![
         Span::styled(" [[ ", Style::default().fg(Color::Rgb(80, 80, 100))),
         Span::styled(
