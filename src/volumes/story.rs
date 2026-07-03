@@ -1,5 +1,5 @@
 // volumes/story.rs — Satoshi's Terminal story content and chapter data
-// Satoshi Labs saga: Saylor's journey from Bitcoin curious to node operator.
+// Satoshi Labs saga: Alex's journey from Bitcoin curious to node operator.
 
 #[derive(Clone)]
 pub struct Chapter {

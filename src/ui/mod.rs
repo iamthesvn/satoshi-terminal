@@ -608,7 +608,7 @@ fn draw_game_complete(frame: &mut Frame, app: &App, border_breathe: Color) {
             .borders(Borders::ALL)
             .border_style(Style::default().fg(border_breathe))
             .title(Span::styled(
-                " Satoshi's Terminal Complete — Saylor, Bitcoin Principal ",
+                " Satoshi's Terminal Complete — Alex, Bitcoin Principal ",
                 Style::default()
                     .fg(Color::Rgb(255, 215, 0))
                     .add_modifier(Modifier::BOLD),

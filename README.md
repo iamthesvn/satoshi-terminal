@@ -17,7 +17,7 @@
    ╚═╝    ╚══════╝  ╚═╝  ╚═╝  ╚═╝     ╚═╝ ╚═╝ ╚═╝  ╚══╝ ╚═╝  ╚═╝ ╚══════╝
 ```
 
-You are **Saylor**, a curious mind stepping into **Satoshi Labs**. From running your first
+You are **Alex**, a curious mind stepping into **Satoshi Labs**. From running your first
 Bitcoin Core node to understanding Taproot and the Lightning Network, every chapter drops you
 into a real protocol concept. Type the right answer or command and level up your Bitcoin IQ.
 
