@@ -599,6 +599,11 @@ impl App {
             KeyCode::Backspace => {
                 self.chapter_state.input.pop();
             }
+            // Some terminals encode Backspace as Ctrl-H (0x08), which crossterm
+            // reports as Char('h') + CONTROL — treat it as Backspace.
+            KeyCode::Char('h') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                self.chapter_state.input.pop();
+            }
             KeyCode::Enter => {
                 let input = self.chapter_state.input.trim().to_string();
                 self.chapter_state.attempts += 1;
@@ -667,7 +672,13 @@ impl App {
                     self.chapter_state.input.clear();
                 }
             }
-            KeyCode::Char(c) => {
+            // Ignore control/alt combos (e.g. Ctrl-A) so they don't leak into
+            // the answer as plain characters.
+            KeyCode::Char(c)
+                if !key
+                    .modifiers
+                    .intersects(KeyModifiers::CONTROL | KeyModifiers::ALT) =>
+            {
                 self.chapter_state.input.push(c);
             }
             _ => {}
